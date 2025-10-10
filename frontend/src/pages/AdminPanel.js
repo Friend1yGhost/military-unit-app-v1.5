@@ -872,7 +872,23 @@ const AdminPanel = () => {
 
             <Card className="bg-military-green border-2 border-military-olive">
               <CardHeader className="border-b border-military-olive">
-                <CardTitle className="text-military-gold">Все Пользователи</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-military-gold">Усі Користувачі</CardTitle>
+                  <Button
+                    onClick={() => {
+                      setCreatingUser(true);
+                      setEditingUser(null);
+                      setUserForm({ full_name: "", email: "", password: "", rank: "", role: "user" });
+                      setRankCategory("");
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="bg-military-accent hover:bg-military-gold text-military-dark font-bold"
+                    data-testid="create-user-btn"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    Створити Користувача
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="space-y-4">
