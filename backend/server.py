@@ -495,6 +495,67 @@ async def get_my_groups(current_user: User = Depends(get_current_user)):
     
     return groups
 
+# External News Integration
+import feedparser
+from bs4 import BeautifulSoup
+
+async def fetch_armyinform_news():
+    """Fetch news from ArmyInform RSS feed"""
+    try:
+        feed_url = "https://armyinform.com.ua/category/news/feed/"
+        feed = feedparser.parse(feed_url)
+        
+        news_items = []
+        for entry in feed.entries[:10]:  # Get latest 10 news
+            # Check if news already exists
+            existing = await db.news.find_one({"external_url": entry.link})
+            if existing:
+                continue
+            
+            # Extract clean summary (first 200 chars)
+            summary = entry.summary if hasattr(entry, 'summary') else entry.title
+            soup = BeautifulSoup(summary, 'html.parser')
+            clean_summary = soup.get_text()[:200] + "..."
+            
+            # Extract image if available
+            image_url = None
+            if hasattr(entry, 'media_content') and entry.media_content:
+                image_url = entry.media_content[0].get('url')
+            elif hasattr(entry, 'enclosures') and entry.enclosures:
+                image_url = entry.enclosures[0].get('href')
+            
+            news = News(
+                title=entry.title,
+                content=clean_summary,
+                image_url=image_url,
+                author_id="armyinform",
+                author_name="ArmyInform",
+                is_external=True,
+                external_url=entry.link,
+                source="armyinform.com.ua",
+                created_at=datetime.now(timezone.utc)
+            )
+            
+            news_doc = news.model_dump()
+            news_doc['created_at'] = news_doc['created_at'].isoformat()
+            
+            await db.news.insert_one(news_doc)
+            news_items.append(news)
+        
+        return news_items
+    except Exception as e:
+        logger.error(f"Error fetching ArmyInform news: {e}")
+        return []
+
+@api_router.post("/news/sync-armyinform")
+async def sync_armyinform_news(current_user: User = Depends(get_admin_user)):
+    """Manually sync news from ArmyInform"""
+    news_items = await fetch_armyinform_news()
+    return {
+        "message": f"Синхронізовано {len(news_items)} новин",
+        "count": len(news_items)
+    }
+
 # Settings Routes
 @api_router.get("/settings", response_model=Settings)
 async def get_settings():
