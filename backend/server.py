@@ -251,6 +251,30 @@ async def login(credentials: UserLogin):
 async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
+@api_router.put("/auth/profile", response_model=User)
+async def update_profile(user_data: UserUpdate, current_user: User = Depends(get_current_user)):
+    update_data = {}
+    
+    if user_data.full_name:
+        update_data['full_name'] = user_data.full_name
+    if user_data.email:
+        # Check if email already exists
+        existing = await db.users.find_one({"email": user_data.email, "id": {"$ne": current_user.id}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already in use")
+        update_data['email'] = user_data.email
+    if user_data.password:
+        update_data['password'] = get_password_hash(user_data.password)
+    
+    if update_data:
+        await db.users.update_one({"id": current_user.id}, {"$set": update_data})
+    
+    updated_user = await db.users.find_one({"id": current_user.id}, {"_id": 0, "password": 0})
+    if isinstance(updated_user['created_at'], str):
+        updated_user['created_at'] = datetime.fromisoformat(updated_user['created_at'])
+    
+    return User(**updated_user)
+
 # News Routes
 @api_router.get("/news", response_model=List[News])
 async def get_news():
