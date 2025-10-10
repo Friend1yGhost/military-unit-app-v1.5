@@ -535,6 +535,28 @@ async def get_my_groups(current_user: User = Depends(get_current_user)):
     
     return groups
 
+@api_router.get("/groups/{group_id}/members", response_model=List[User])
+async def get_group_members(group_id: str, current_user: User = Depends(get_current_user)):
+    """Get all members of a specific group"""
+    group = await db.groups.find_one({"id": group_id}, {"_id": 0})
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+    
+    # Check if current user is a member of this group
+    if current_user.id not in group.get('member_ids', []) and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get all members
+    members = []
+    for member_id in group.get('member_ids', []):
+        user_doc = await db.users.find_one({"id": member_id}, {"_id": 0, "password": 0})
+        if user_doc:
+            if isinstance(user_doc['created_at'], str):
+                user_doc['created_at'] = datetime.fromisoformat(user_doc['created_at'])
+            members.append(User(**user_doc))
+    
+    return members
+
 # External News Integration
 import feedparser
 from bs4 import BeautifulSoup
