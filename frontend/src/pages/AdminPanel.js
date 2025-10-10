@@ -258,16 +258,30 @@ const AdminPanel = () => {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.put(`${API}/users/${editingUser.id}`, userForm, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      if (editingUser) {
+        // Update existing user
+        await axios.put(`${API}/users/${editingUser.id}`, userForm, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success("Користувача оновлено!");
+        setEditingUser(null);
+      } else {
+        // Create new user
+        await axios.post(`${API}/auth/register`, {
+          ...userForm,
+          email: userForm.email || `user_${Date.now()}@military.local` // Fallback email
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success("Користувача створено!");
+        setCreatingUser(false);
+      }
 
-      toast.success("Пользователь обновлен!");
-      setEditingUser(null);
-      setUserForm({ full_name: "", email: "", password: "", role: "user" });
+      setUserForm({ full_name: "", email: "", password: "", rank: "", role: "user" });
+      setRankCategory("");
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Ошибка обновления пользователя");
+      toast.error(error.response?.data?.detail || "Помилка");
     }
   };
 
