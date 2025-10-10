@@ -306,10 +306,15 @@ const MyDuties = () => {
                       <CardContent className="pt-6">
                         {renderMonthSchedule(group)}
                         <div className="mt-4 p-4 bg-military-dark rounded-lg border border-military-olive">
-                          <p className="text-military-accent text-sm">
-                            <span className="font-semibold">Легенда:</span> Ваши наряды выделены{" "}
-                            <span className="inline-block px-2 py-1 bg-military-gold text-military-dark text-xs font-bold rounded">
-                              золотым цветом
+                          <p className="text-military-accent text-sm flex items-center gap-3 flex-wrap">
+                            <span className="font-semibold">Легенда:</span>
+                            <span className="flex items-center gap-2">
+                              <span className="inline-block w-6 h-6 bg-green-600 rounded"></span>
+                              <span>Ваші наряди</span>
+                            </span>
+                            <span className="flex items-center gap-2">
+                              <span className="inline-block w-6 h-6 bg-black rounded border border-military-olive"></span>
+                              <span>Інші учасники</span>
                             </span>
                           </p>
                         </div>
