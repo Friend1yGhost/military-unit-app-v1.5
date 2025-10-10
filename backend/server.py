@@ -390,6 +390,40 @@ async def create_duty(duty_data: DutyRosterCreate, current_user: User = Depends(
     await db.duties.insert_one(duty_doc)
     return duty
 
+@api_router.put("/duties/{duty_id}", response_model=DutyRoster)
+async def update_duty(duty_id: str, duty_data: DutyRosterCreate, current_user: User = Depends(get_admin_user)):
+    existing_duty = await db.duties.find_one({"id": duty_id}, {"_id": 0})
+    if not existing_duty:
+        raise HTTPException(status_code=404, detail="Duty not found")
+    
+    # Get user info
+    user_doc = await db.users.find_one({"id": duty_data.user_id}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    update_data = {
+        "user_id": duty_data.user_id,
+        "user_name": user_doc['full_name'],
+        "duty_type": duty_data.duty_type,
+        "position": duty_data.position,
+        "shift_start": datetime.fromisoformat(duty_data.shift_start).isoformat(),
+        "shift_end": datetime.fromisoformat(duty_data.shift_end).isoformat(),
+        "rotation_cycle": duty_data.rotation_cycle,
+        "notes": duty_data.notes
+    }
+    
+    await db.duties.update_one({"id": duty_id}, {"$set": update_data})
+    
+    updated_duty = await db.duties.find_one({"id": duty_id}, {"_id": 0})
+    if isinstance(updated_duty['created_at'], str):
+        updated_duty['created_at'] = datetime.fromisoformat(updated_duty['created_at'])
+    if isinstance(updated_duty['shift_start'], str):
+        updated_duty['shift_start'] = datetime.fromisoformat(updated_duty['shift_start'])
+    if isinstance(updated_duty['shift_end'], str):
+        updated_duty['shift_end'] = datetime.fromisoformat(updated_duty['shift_end'])
+    
+    return DutyRoster(**updated_duty)
+
 @api_router.delete("/duties/{duty_id}")
 async def delete_duty(duty_id: str, current_user: User = Depends(get_admin_user)):
     result = await db.duties.delete_one({"id": duty_id})
