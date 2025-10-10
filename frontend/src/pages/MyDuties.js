@@ -24,17 +24,38 @@ const MyDuties = () => {
     const config = { headers: { Authorization: `Bearer ${token}` } };
 
     try {
-      const [dutiesRes, groupsRes, allDutiesRes, usersRes] = await Promise.all([
+      const [dutiesRes, groupsRes, allDutiesRes] = await Promise.all([
         axios.get(`${API}/duties/my`, config),
         axios.get(`${API}/groups/my`, config),
-        axios.get(`${API}/duties`, config),
-        axios.get(`${API}/users`, config).catch(() => ({ data: [] }))
+        axios.get(`${API}/duties`, config)
       ]);
 
       setDuties(dutiesRes.data);
       setMyGroups(groupsRes.data);
       setAllDuties(allDutiesRes.data);
-      setUsers(usersRes.data);
+
+      // Get unique user IDs from duties
+      const userIds = [...new Set(allDutiesRes.data.map(d => d.user_id))];
+      
+      // Fetch user details for each unique user
+      const userPromises = userIds.map(async (userId) => {
+        try {
+          // Get user from duty data (user_name is already there)
+          const duty = allDutiesRes.data.find(d => d.user_id === userId);
+          if (duty) {
+            return {
+              id: userId,
+              full_name: duty.user_name,
+              rank: null // We'll fetch this separately if needed
+            };
+          }
+        } catch (error) {
+          return null;
+        }
+      });
+
+      const usersData = (await Promise.all(userPromises)).filter(u => u !== null);
+      setUsers(usersData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
