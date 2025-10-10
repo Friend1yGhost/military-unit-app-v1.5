@@ -60,6 +60,8 @@ const AdminPanel = () => {
     rotation_cycle: "weekly",
     notes: ""
   });
+  const [selectedDates, setSelectedDates] = useState([]);
+  const [bulkMode, setBulkMode] = useState(true);
 
   useEffect(() => {
     fetchData();
