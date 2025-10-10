@@ -140,6 +140,7 @@ class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     email: Optional[EmailStr] = None
     password: Optional[str] = None
+    rank: Optional[str] = None
     role: Optional[str] = None
 
 # Helper functions
