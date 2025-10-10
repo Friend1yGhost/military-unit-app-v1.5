@@ -58,16 +58,41 @@ const AdminPanel = () => {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.post(`${API}/news`, newsForm, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      toast.success("Новость опубликована!");
+      if (editingNews) {
+        // Update existing news
+        await axios.put(`${API}/news/${editingNews.id}`, newsForm, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success("Новость обновлена!");
+        setEditingNews(null);
+      } else {
+        // Create new news
+        await axios.post(`${API}/news`, newsForm, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success("Новость опубликована!");
+      }
+      
       setNewsForm({ title: "", content: "", image_url: "" });
       fetchData();
     } catch (error) {
-      toast.error("Ошибка публикации новости");
+      toast.error(editingNews ? "Ошибка обновления новости" : "Ошибка публикации новости");
     }
+  };
+
+  const handleEditNews = (newsItem) => {
+    setEditingNews(newsItem);
+    setNewsForm({
+      title: newsItem.title,
+      content: newsItem.content,
+      image_url: newsItem.image_url || ""
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingNews(null);
+    setNewsForm({ title: "", content: "", image_url: "" });
   };
 
   const handleDeleteNews = async (id) => {
