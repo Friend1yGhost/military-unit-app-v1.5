@@ -58,23 +58,43 @@ const MyDuties = () => {
     });
   };
 
-  const renderWeekSchedule = (group) => {
-    const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-    const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  const renderMonthSchedule = (group) => {
+    const currentDate = new Date();
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
     const groupMembers = users.filter(u => group.member_ids?.includes(u.id));
+
+    // Group days by weeks for better display
+    const weeks = [];
+    let currentWeek = [];
+    
+    days.forEach((day, idx) => {
+      currentWeek.push(day);
+      if (currentWeek.length === 7 || idx === days.length - 1) {
+        weeks.push([...currentWeek]);
+        currentWeek = [];
+      }
+    });
 
     return (
       <div className="overflow-x-auto">
+        <div className="mb-4 p-3 bg-military-olive rounded-lg">
+          <h3 className="text-military-gold font-bold text-lg text-center">
+            {format(currentDate, "LLLL yyyy", { locale: ru })}
+          </h3>
+        </div>
+        
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-military-olive">
-              <th className="border border-military-dark p-3 text-military-light text-left sticky left-0 bg-military-olive z-10">
+              <th className="border border-military-dark p-3 text-military-light text-left sticky left-0 bg-military-olive z-10 min-w-[150px]">
                 Участник
               </th>
               {days.map((day, idx) => (
-                <th key={idx} className="border border-military-dark p-3 text-military-light text-center min-w-[120px]">
-                  <div className="font-bold">{format(day, "EEEE", { locale: ru })}</div>
-                  <div className="text-sm text-military-accent">{format(day, "dd.MM", { locale: ru })}</div>
+                <th key={idx} className="border border-military-dark p-2 text-military-light text-center min-w-[100px]">
+                  <div className="text-xs font-bold">{format(day, "EEE", { locale: ru })}</div>
+                  <div className="text-lg font-bold">{format(day, "dd", { locale: ru })}</div>
                 </th>
               ))}
             </tr>
