@@ -340,18 +340,30 @@ const AdminPanel = () => {
                       </>
                     )}
                   </CardTitle>
-                  {editingNews && (
+                  <div className="flex items-center gap-2">
+                    {editingNews && (
+                      <Button
+                        type="button"
+                        onClick={handleCancelEdit}
+                        variant="ghost"
+                        className="text-military-light hover:text-military-accent"
+                        data-testid="cancel-edit-btn"
+                      >
+                        <X className="w-5 h-5 mr-1" />
+                        Отменить
+                      </Button>
+                    )}
                     <Button
                       type="button"
-                      onClick={handleCancelEdit}
-                      variant="ghost"
-                      className="text-military-light hover:text-military-accent"
-                      data-testid="cancel-edit-btn"
+                      onClick={handleSyncArmyInform}
+                      variant="outline"
+                      className="border-military-accent text-military-accent hover:bg-military-accent hover:text-military-dark"
+                      data-testid="sync-armyinform-btn"
                     >
-                      <X className="w-5 h-5 mr-1" />
-                      Отменить
+                      <Download className="w-5 h-5 mr-2" />
+                      Синхронізувати з ArmyInform
                     </Button>
-                  )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
