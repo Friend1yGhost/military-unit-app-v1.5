@@ -34,28 +34,25 @@ const MyDuties = () => {
       setMyGroups(groupsRes.data);
       setAllDuties(allDutiesRes.data);
 
-      // Get unique user IDs from duties
-      const userIds = [...new Set(allDutiesRes.data.map(d => d.user_id))];
-      
-      // Fetch user details for each unique user
-      const userPromises = userIds.map(async (userId) => {
-        try {
-          // Get user from duty data (user_name is already there)
-          const duty = allDutiesRes.data.find(d => d.user_id === userId);
-          if (duty) {
-            return {
-              id: userId,
-              full_name: duty.user_name,
-              rank: null // We'll fetch this separately if needed
-            };
+      // Fetch members for all groups
+      if (groupsRes.data.length > 0) {
+        const allMembers = [];
+        for (const group of groupsRes.data) {
+          try {
+            const membersRes = await axios.get(`${API}/groups/${group.id}/members`, config);
+            allMembers.push(...membersRes.data);
+          } catch (error) {
+            console.error(`Error fetching members for group ${group.id}:`, error);
           }
-        } catch (error) {
-          return null;
         }
-      });
-
-      const usersData = (await Promise.all(userPromises)).filter(u => u !== null);
-      setUsers(usersData);
+        
+        // Remove duplicates based on user id
+        const uniqueMembers = allMembers.filter((member, index, self) =>
+          index === self.findIndex((m) => m.id === member.id)
+        );
+        
+        setUsers(uniqueMembers);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
