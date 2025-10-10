@@ -101,11 +101,13 @@ class Settings(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = "military_unit_settings"
     unit_name: str = "Военная Часть"
+    unit_subtitle: str = "Информационная Система"
     unit_icon: str = "https://cdn-icons-png.flaticon.com/512/2913/2913133.png"
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class SettingsUpdate(BaseModel):
     unit_name: Optional[str] = None
+    unit_subtitle: Optional[str] = None
     unit_icon: Optional[str] = None
 
 # Helper functions
