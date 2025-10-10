@@ -5,11 +5,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { User, Mail, Lock, Save } from "lucide-react";
 
+const RANK_CATEGORIES = {
+  "Рядовий": ["солдат", "старший солдат"],
+  "Сержантський склад": [
+    "молодший сержант",
+    "сержант",
+    "старший сержант",
+    "головний сержант",
+    "штаб-сержант",
+    "майстер-сержант",
+    "старший майстер-сержант",
+    "головний майстер-сержант"
+  ],
+  "Молодший офіцерський склад": [
+    "молодший лейтенант",
+    "лейтенант",
+    "старший лейтенант",
+    "капітан"
+  ],
+  "Старший офіцерський склад": [
+    "майор",
+    "підполковник",
+    "полковник"
+  ]
+};
+
 const Profile = () => {
   const { user, setUser } = useContext(AuthContext);
+  const [rankCategory, setRankCategory] = useState("");
   const [formData, setFormData] = useState({
     full_name: user?.full_name || "",
     email: user?.email || "",
