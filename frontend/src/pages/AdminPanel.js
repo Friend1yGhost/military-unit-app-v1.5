@@ -21,6 +21,7 @@ const AdminPanel = () => {
   const [editingNews, setEditingNews] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
   const [editingGroup, setEditingGroup] = useState(null);
+  const [editingDuty, setEditingDuty] = useState(null);
   const [groupForm, setGroupForm] = useState({ name: "", description: "", member_ids: [] });
   const [userForm, setUserForm] = useState({ full_name: "", email: "", password: "", role: "user" });
   const [dutyForm, setDutyForm] = useState({
