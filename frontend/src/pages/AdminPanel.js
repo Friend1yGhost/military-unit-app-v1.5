@@ -253,11 +253,13 @@ const AdminPanel = () => {
                       onChange={(e) => setNewsForm({ ...newsForm, image_url: e.target.value })}
                       className="bg-military-dark border-military-olive text-military-light"
                       data-testid="news-image-input"
+                      placeholder="https://example.com/image.jpg"
                     />
+                    <p className="text-military-accent text-sm">Рекомендуемый размер: 800x600px или больше</p>
                   </div>
 
                   <Button type="submit" className="bg-military-olive hover:bg-military-accent text-military-dark font-bold" data-testid="publish-news-btn">
-                    Опубликовать
+                    {editingNews ? "Обновить" : "Опубликовать"}
                   </Button>
                 </form>
               </CardContent>
