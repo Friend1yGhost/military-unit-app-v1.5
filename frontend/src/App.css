@@ -1,34 +1,62 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+:root {
+  --military-dark: #1a2318;
+  --military-green: #3a4a35;
+  --military-olive: #5a6b4f;
+  --military-light: #c9d4bf;
+  --military-accent: #8fa87a;
+  --military-gold: #d4af37;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--military-dark);
+  color: var(--military-light);
 }
 
-.App-link {
-    color: #61dafb;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.bg-military-dark {
+  background-color: var(--military-dark);
+}
+
+.bg-military-green {
+  background-color: var(--military-green);
+}
+
+.bg-military-olive {
+  background-color: var(--military-olive);
+}
+
+.text-military-light {
+  color: var(--military-light);
+}
+
+.text-military-accent {
+  color: var(--military-accent);
+}
+
+.text-military-gold {
+  color: var(--military-gold);
+}
+
+.border-military-olive {
+  border-color: var(--military-olive);
+}
+
+.hover\:bg-military-olive:hover {
+  background-color: var(--military-olive);
+}
+
+.hover\:border-military-accent:hover {
+  border-color: var(--military-accent);
 }
