@@ -499,6 +499,30 @@ async def get_my_groups(current_user: User = Depends(get_current_user)):
 import feedparser
 from bs4 import BeautifulSoup
 
+import httpx
+
+async def fetch_image_from_page(url: str) -> str:
+    """Fetch post-thumbnail image from news page"""
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(url)
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # Find post-thumbnail image
+            thumbnail = soup.find('img', class_='post-thumbnail')
+            if thumbnail and thumbnail.get('src'):
+                return thumbnail['src']
+            
+            # Fallback: find any large image
+            og_image = soup.find('meta', property='og:image')
+            if og_image and og_image.get('content'):
+                return og_image['content']
+                
+        return None
+    except Exception as e:
+        logger.error(f"Error fetching image from {url}: {e}")
+        return None
+
 async def fetch_armyinform_news():
     """Fetch news from ArmyInform RSS feed"""
     try:
@@ -517,12 +541,8 @@ async def fetch_armyinform_news():
             soup = BeautifulSoup(summary, 'html.parser')
             clean_summary = soup.get_text()[:200] + "..."
             
-            # Extract image if available
-            image_url = None
-            if hasattr(entry, 'media_content') and entry.media_content:
-                image_url = entry.media_content[0].get('url')
-            elif hasattr(entry, 'enclosures') and entry.enclosures:
-                image_url = entry.enclosures[0].get('href')
+            # Fetch image from actual page with post-thumbnail class
+            image_url = await fetch_image_from_page(entry.link)
             
             news = News(
                 title=entry.title,
