@@ -625,12 +625,53 @@ const AdminPanel = () => {
                     </div>
                   </div>
 
+                  {!editingDuty && (
+                    <div className="p-4 bg-military-dark rounded-lg border border-military-olive space-y-3">
+                      <Label className="text-military-light font-semibold">Виберіть дати нарядів</Label>
+                      <div className="grid grid-cols-7 gap-2">
+                        {Array.from({ length: 31 }, (_, i) => {
+                          const day = i + 1;
+                          const date = new Date();
+                          date.setDate(day);
+                          const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                          const isSelected = selectedDates.includes(dateStr);
+                          
+                          return (
+                            <button
+                              key={day}
+                              type="button"
+                              onClick={() => {
+                                if (isSelected) {
+                                  setSelectedDates(selectedDates.filter(d => d !== dateStr));
+                                } else {
+                                  setSelectedDates([...selectedDates, dateStr]);
+                                }
+                              }}
+                              className={`p-2 rounded text-sm font-semibold transition-colors ${
+                                isSelected
+                                  ? 'bg-military-gold text-military-dark'
+                                  : 'bg-military-green text-military-light hover:bg-military-olive'
+                              }`}
+                            >
+                              {day}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p className="text-military-accent text-sm">
+                        Обрано днів: {selectedDates.length}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="shift_start" className="text-military-light">Начало Смены</Label>
+                      <Label htmlFor="shift_start" className="text-military-light">
+                        {editingDuty ? "Початок Зміни" : "Час Початку"}
+                      </Label>
                       <Input
                         id="shift_start"
-                        type="datetime-local"
+                        type={editingDuty ? "datetime-local" : "time"}
                         value={dutyForm.shift_start}
                         onChange={(e) => setDutyForm({ ...dutyForm, shift_start: e.target.value })}
                         className="bg-military-dark border-military-olive text-military-light"
@@ -640,10 +681,12 @@ const AdminPanel = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="shift_end" className="text-military-light">Конец Смены</Label>
+                      <Label htmlFor="shift_end" className="text-military-light">
+                        {editingDuty ? "Кінець Зміни" : "Час Закінчення"}
+                      </Label>
                       <Input
                         id="shift_end"
-                        type="datetime-local"
+                        type={editingDuty ? "datetime-local" : "time"}
                         value={dutyForm.shift_end}
                         onChange={(e) => setDutyForm({ ...dutyForm, shift_end: e.target.value })}
                         className="bg-military-dark border-military-olive text-military-light"
