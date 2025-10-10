@@ -585,6 +585,317 @@ const AdminPanel = () => {
             </Card>
           </TabsContent>
 
+          {/* Users Tab */}
+          <TabsContent value="users" className="space-y-8">
+            {editingUser && (
+              <Card className="bg-military-green border-2 border-military-olive">
+                <CardHeader className="border-b border-military-olive">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-military-gold flex items-center">
+                      <Edit className="w-6 h-6 mr-2" />
+                      Редактировать Пользователя
+                    </CardTitle>
+                    <Button
+                      type="button"
+                      onClick={() => setEditingUser(null)}
+                      variant="ghost"
+                      className="text-military-light hover:text-military-accent"
+                    >
+                      <X className="w-5 h-5 mr-1" />
+                      Отменить
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <form onSubmit={handleUserSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="user_full_name" className="text-military-light">Полное Имя</Label>
+                        <Input
+                          id="user_full_name"
+                          value={userForm.full_name}
+                          onChange={(e) => setUserForm({ ...userForm, full_name: e.target.value })}
+                          className="bg-military-dark border-military-olive text-military-light"
+                          required
+                          data-testid="user-name-input"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="user_email" className="text-military-light">Email</Label>
+                        <Input
+                          id="user_email"
+                          type="email"
+                          value={userForm.email}
+                          onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
+                          className="bg-military-dark border-military-olive text-military-light"
+                          required
+                          data-testid="user-email-input"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="user_password" className="text-military-light">Новый Пароль (необязательно)</Label>
+                        <Input
+                          id="user_password"
+                          type="password"
+                          value={userForm.password}
+                          onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                          className="bg-military-dark border-military-olive text-military-light"
+                          placeholder="Оставьте пустым, чтобы не менять"
+                          data-testid="user-password-input"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="user_role" className="text-military-light">Роль</Label>
+                        <Select value={userForm.role} onValueChange={(value) => setUserForm({ ...userForm, role: value })}>
+                          <SelectTrigger className="bg-military-dark border-military-olive text-military-light" data-testid="user-role-select">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-military-dark border-military-olive">
+                            <SelectItem value="user" className="text-military-light">Пользователь</SelectItem>
+                            <SelectItem value="admin" className="text-military-light">Администратор</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <Button type="submit" className="bg-military-olive hover:bg-military-accent text-military-dark font-bold" data-testid="save-user-btn">
+                      Сохранить Изменения
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
+
+            <Card className="bg-military-green border-2 border-military-olive">
+              <CardHeader className="border-b border-military-olive">
+                <CardTitle className="text-military-gold">Все Пользователи</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  {users.map((userItem) => (
+                    <div
+                      key={userItem.id}
+                      className="flex items-start justify-between p-4 bg-military-dark rounded-lg border border-military-olive hover:border-military-accent transition-colors"
+                      data-testid={`user-item-${userItem.id}`}
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <User className="w-5 h-5 text-military-gold" />
+                          <h3 className="text-military-gold font-bold text-lg">{userItem.full_name}</h3>
+                          {userItem.role === "admin" && (
+                            <span className="px-2 py-1 bg-military-gold text-military-dark text-xs font-bold rounded">
+                              ADMIN
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-military-light text-sm mb-1">
+                          <span className="text-military-accent">Email:</span> {userItem.email}
+                        </p>
+                        <p className="text-military-accent text-xs">
+                          Дата регистрации: {new Date(userItem.created_at).toLocaleDateString("ru")}
+                        </p>
+                      </div>
+                      <div className="flex gap-2 ml-4">
+                        <Button
+                          onClick={() => handleEditUser(userItem)}
+                          variant="outline"
+                          size="sm"
+                          className="border-military-olive text-military-light hover:bg-military-olive hover:text-military-gold"
+                          data-testid={`edit-user-btn-${userItem.id}`}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteUser(userItem.id)}
+                          variant="destructive"
+                          size="sm"
+                          data-testid={`delete-user-btn-${userItem.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Groups Tab */}
+          <TabsContent value="groups" className="space-y-8">
+            <Card className="bg-military-green border-2 border-military-olive">
+              <CardHeader className="border-b border-military-olive">
+                <CardTitle className="text-military-gold flex items-center">
+                  {editingGroup ? (
+                    <>
+                      <Edit className="w-6 h-6 mr-2" />
+                      Редактировать Группу
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-6 h-6 mr-2" />
+                      Создать Группу (Подразделение)
+                    </>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <form onSubmit={handleGroupSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="group_name" className="text-military-light text-lg">Название Группы</Label>
+                    <Input
+                      id="group_name"
+                      value={groupForm.name}
+                      onChange={(e) => setGroupForm({ ...groupForm, name: e.target.value })}
+                      className="bg-military-dark border-military-olive text-military-light"
+                      required
+                      placeholder="Например: 1-й Взвод, Инженерная Рота"
+                      data-testid="group-name-input"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="group_description" className="text-military-light">Описание</Label>
+                    <Textarea
+                      id="group_description"
+                      value={groupForm.description}
+                      onChange={(e) => setGroupForm({ ...groupForm, description: e.target.value })}
+                      className="bg-military-dark border-military-olive text-military-light min-h-[100px]"
+                      placeholder="Дополнительная информация о подразделении"
+                      data-testid="group-description-input"
+                    />
+                  </div>
+
+                  {editingGroup && (
+                    <div className="space-y-3 p-4 bg-military-dark rounded-lg border border-military-olive">
+                      <Label className="text-military-light text-lg">Участники Группы</Label>
+                      <div className="max-h-64 overflow-y-auto space-y-2">
+                        {users.map((userItem) => (
+                          <div
+                            key={userItem.id}
+                            className="flex items-center space-x-3 p-3 bg-military-green rounded hover:bg-military-olive transition-colors cursor-pointer"
+                            onClick={() => toggleGroupMember(userItem.id)}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={groupForm.member_ids.includes(userItem.id)}
+                              onChange={() => toggleGroupMember(userItem.id)}
+                              className="w-5 h-5 cursor-pointer"
+                              data-testid={`group-member-${userItem.id}`}
+                            />
+                            <div className="flex-1">
+                              <p className="text-military-light font-semibold">{userItem.full_name}</p>
+                              <p className="text-military-accent text-sm">{userItem.email}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-military-accent text-sm">
+                        Выбрано: {groupForm.member_ids.length} участников
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <Button 
+                      type="submit" 
+                      className="bg-military-olive hover:bg-military-accent text-military-dark font-bold flex-1"
+                      data-testid="save-group-btn"
+                    >
+                      {editingGroup ? "Сохранить Изменения" : "Создать Группу"}
+                    </Button>
+                    {editingGroup && (
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setEditingGroup(null);
+                          setGroupForm({ name: "", description: "", member_ids: [] });
+                        }}
+                        variant="outline"
+                        className="border-military-olive text-military-light"
+                      >
+                        Отменить
+                      </Button>
+                    )}
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-military-green border-2 border-military-olive">
+              <CardHeader className="border-b border-military-olive">
+                <CardTitle className="text-military-gold">Все Группы</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {groups.map((groupItem) => (
+                    <Card
+                      key={groupItem.id}
+                      className="bg-military-dark border border-military-olive hover:border-military-accent transition-all"
+                      data-testid={`group-item-${groupItem.id}`}
+                    >
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-military-gold text-xl mb-2">
+                              {groupItem.name}
+                            </CardTitle>
+                            {groupItem.description && (
+                              <p className="text-military-light text-sm">{groupItem.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center justify-between mb-3 pb-3 border-b border-military-olive">
+                          <div className="flex items-center space-x-2 text-military-accent">
+                            <User className="w-4 h-4" />
+                            <span className="text-sm">
+                              Участников: {groupItem.member_ids?.length || 0}
+                            </span>
+                          </div>
+                          <span className="text-military-accent text-xs">
+                            {new Date(groupItem.created_at).toLocaleDateString("ru")}
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleEditGroup(groupItem)}
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 border-military-olive text-military-light hover:bg-military-olive hover:text-military-gold"
+                            data-testid={`edit-group-btn-${groupItem.id}`}
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Редактировать
+                          </Button>
+                          <Button
+                            onClick={() => handleDeleteGroup(groupItem.id)}
+                            variant="destructive"
+                            size="sm"
+                            data-testid={`delete-group-btn-${groupItem.id}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  {groups.length === 0 && (
+                    <div className="col-span-2 text-center py-12 text-military-accent">
+                      <p>Групп пока нет. Создайте первую группу выше.</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Settings Tab */}
           <TabsContent value="settings" className="space-y-8">
             <Card className="bg-military-green border-2 border-military-olive">
