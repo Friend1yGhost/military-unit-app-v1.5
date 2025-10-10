@@ -42,16 +42,18 @@ const AdminPanel = () => {
     const config = { headers: { Authorization: `Bearer ${token}` } };
 
     try {
-      const [newsRes, dutiesRes, usersRes, settingsRes] = await Promise.all([
+      const [newsRes, dutiesRes, usersRes, groupsRes, settingsRes] = await Promise.all([
         axios.get(`${API}/news`),
         axios.get(`${API}/duties`, config),
         axios.get(`${API}/users`, config),
+        axios.get(`${API}/groups`, config),
         axios.get(`${API}/settings`)
       ]);
 
       setNews(newsRes.data);
       setDuties(dutiesRes.data);
       setUsers(usersRes.data);
+      setGroups(groupsRes.data);
       setSettings(settingsRes.data);
     } catch (error) {
       toast.error("Ошибка загрузки данных");
