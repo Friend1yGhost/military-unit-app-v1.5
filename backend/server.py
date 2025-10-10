@@ -398,6 +398,100 @@ async def get_users(current_user: User = Depends(get_admin_user)):
     
     return users
 
+@api_router.put("/users/{user_id}", response_model=User)
+async def update_user(user_id: str, user_data: UserUpdate, current_user: User = Depends(get_admin_user)):
+    existing_user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    update_data = {}
+    if user_data.full_name:
+        update_data['full_name'] = user_data.full_name
+    if user_data.email:
+        other_user = await db.users.find_one({"email": user_data.email, "id": {"$ne": user_id}})
+        if other_user:
+            raise HTTPException(status_code=400, detail="Email already in use")
+        update_data['email'] = user_data.email
+    if user_data.password:
+        update_data['password'] = get_password_hash(user_data.password)
+    if user_data.role:
+        update_data['role'] = user_data.role
+    
+    if update_data:
+        await db.users.update_one({"id": user_id}, {"$set": update_data})
+    
+    updated_user = await db.users.find_one({"id": user_id}, {"_id": 0, "password": 0})
+    if isinstance(updated_user['created_at'], str):
+        updated_user['created_at'] = datetime.fromisoformat(updated_user['created_at'])
+    
+    return User(**updated_user)
+
+@api_router.delete("/users/{user_id}")
+async def delete_user(user_id: str, current_user: User = Depends(get_admin_user)):
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User deleted successfully"}
+
+# Groups Routes
+@api_router.get("/groups", response_model=List[Group])
+async def get_groups(current_user: User = Depends(get_current_user)):
+    groups = await db.groups.find({}, {"_id": 0}).to_list(1000)
+    
+    for group in groups:
+        if isinstance(group['created_at'], str):
+            group['created_at'] = datetime.fromisoformat(group['created_at'])
+    
+    return groups
+
+@api_router.post("/groups", response_model=Group)
+async def create_group(group_data: GroupCreate, current_user: User = Depends(get_admin_user)):
+    group = Group(
+        name=group_data.name,
+        description=group_data.description,
+        member_ids=[]
+    )
+    
+    group_doc = group.model_dump()
+    group_doc['created_at'] = group_doc['created_at'].isoformat()
+    
+    await db.groups.insert_one(group_doc)
+    return group
+
+@api_router.put("/groups/{group_id}", response_model=Group)
+async def update_group(group_id: str, group_data: GroupUpdate, current_user: User = Depends(get_admin_user)):
+    existing_group = await db.groups.find_one({"id": group_id}, {"_id": 0})
+    if not existing_group:
+        raise HTTPException(status_code=404, detail="Group not found")
+    
+    update_data = {k: v for k, v in group_data.model_dump().items() if v is not None}
+    
+    if update_data:
+        await db.groups.update_one({"id": group_id}, {"$set": update_data})
+    
+    updated_group = await db.groups.find_one({"id": group_id}, {"_id": 0})
+    if isinstance(updated_group['created_at'], str):
+        updated_group['created_at'] = datetime.fromisoformat(updated_group['created_at'])
+    
+    return Group(**updated_group)
+
+@api_router.delete("/groups/{group_id}")
+async def delete_group(group_id: str, current_user: User = Depends(get_admin_user)):
+    result = await db.groups.delete_one({"id": group_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Group not found")
+    return {"message": "Group deleted successfully"}
+
+@api_router.get("/groups/my", response_model=List[Group])
+async def get_my_groups(current_user: User = Depends(get_current_user)):
+    groups = await db.groups.find({"member_ids": current_user.id}, {"_id": 0}).to_list(1000)
+    
+    for group in groups:
+        if isinstance(group['created_at'], str):
+            group['created_at'] = datetime.fromisoformat(group['created_at'])
+    
+    return groups
+
 # Settings Routes
 @api_router.get("/settings", response_model=Settings)
 async def get_settings():
