@@ -102,6 +102,16 @@ class DutyRosterCreate(BaseModel):
     rotation_cycle: str
     notes: Optional[str] = None
 
+class DutyRosterBulkCreate(BaseModel):
+    user_id: str
+    duty_type: str
+    position: str
+    dates: List[str]  # List of dates in ISO format (YYYY-MM-DD)
+    shift_start_time: str  # Time only (HH:MM)
+    shift_end_time: str  # Time only (HH:MM)
+    rotation_cycle: str
+    notes: Optional[str] = None
+
 class Settings(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = "military_unit_settings"
