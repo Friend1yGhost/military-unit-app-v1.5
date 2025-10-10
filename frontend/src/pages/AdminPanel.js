@@ -167,11 +167,118 @@ const AdminPanel = () => {
       });
 
       toast.success("Настройки обновлены!");
-      // Refresh to update navbar
       window.location.reload();
     } catch (error) {
       toast.error("Ошибка обновления настроек");
     }
+  };
+
+  // User management handlers
+  const handleEditUser = (userItem) => {
+    setEditingUser(userItem);
+    setUserForm({
+      full_name: userItem.full_name,
+      email: userItem.email,
+      password: "",
+      role: userItem.role
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleUserSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    try {
+      await axios.put(`${API}/users/${editingUser.id}`, userForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      toast.success("Пользователь обновлен!");
+      setEditingUser(null);
+      setUserForm({ full_name: "", email: "", password: "", role: "user" });
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Ошибка обновления пользователя");
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm("Удалить этого пользователя?")) return;
+    
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(`${API}/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Пользователь удален");
+      fetchData();
+    } catch (error) {
+      toast.error("Ошибка удаления пользователя");
+    }
+  };
+
+  // Group management handlers
+  const handleGroupSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    try {
+      if (editingGroup) {
+        await axios.put(`${API}/groups/${editingGroup.id}`, groupForm, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success("Группа обновлена!");
+        setEditingGroup(null);
+      } else {
+        await axios.post(`${API}/groups`, { name: groupForm.name, description: groupForm.description }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success("Группа создана!");
+      }
+      
+      setGroupForm({ name: "", description: "", member_ids: [] });
+      fetchData();
+    } catch (error) {
+      toast.error(editingGroup ? "Ошибка обновления группы" : "Ошибка создания группы");
+    }
+  };
+
+  const handleEditGroup = (groupItem) => {
+    setEditingGroup(groupItem);
+    setGroupForm({
+      name: groupItem.name,
+      description: groupItem.description || "",
+      member_ids: groupItem.member_ids || []
+    });
+  };
+
+  const handleDeleteGroup = async (groupId) => {
+    if (!window.confirm("Удалить эту группу?")) return;
+    
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(`${API}/groups/${groupId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Группа удалена");
+      fetchData();
+    } catch (error) {
+      toast.error("Ошибка удаления группы");
+    }
+  };
+
+  const toggleGroupMember = (userId) => {
+    const members = [...groupForm.member_ids];
+    const index = members.indexOf(userId);
+    
+    if (index > -1) {
+      members.splice(index, 1);
+    } else {
+      members.push(userId);
+    }
+    
+    setGroupForm({ ...groupForm, member_ids: members });
   };
 
   return (
