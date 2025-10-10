@@ -152,6 +152,17 @@ const Navbar = () => {
                   <div className="text-military-light text-sm px-2 pb-2 border-b border-military-olive">
                     {user.full_name}
                   </div>
+
+                  <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start text-military-light hover:bg-military-olive hover:text-military-gold"
+                      data-testid="profile-mobile-btn"
+                    >
+                      <UserIcon className="w-4 h-4 mr-2" />
+                      Профиль
+                    </Button>
+                  </Link>
                   
                   <Link to="/my-duties" onClick={() => setMobileMenuOpen(false)}>
                     <Button 
