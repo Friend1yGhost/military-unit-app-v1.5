@@ -102,6 +102,18 @@ const Profile = () => {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="rank" className="text-military-light">Військове Звання</Label>
+                <Input
+                  id="rank"
+                  value={formData.rank}
+                  onChange={(e) => setFormData({ ...formData, rank: e.target.value })}
+                  className="bg-military-dark border-military-olive text-military-light"
+                  placeholder="Наприклад: Солдат, Сержант, Лейтенант..."
+                  data-testid="profile-rank-input"
+                />
+              </div>
+
               <div className="pt-4 border-t border-military-olive">
                 <h3 className="text-military-gold font-semibold mb-4 flex items-center">
                   <Lock className="w-5 h-5 mr-2" />
