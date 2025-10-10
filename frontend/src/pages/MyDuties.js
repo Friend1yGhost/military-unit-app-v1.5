@@ -65,40 +65,40 @@ const MyDuties = () => {
     const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
     const groupMembers = users.filter(u => group.member_ids?.includes(u.id));
 
-    // Group days by weeks for better display
-    const weeks = [];
-    let currentWeek = [];
-    
-    days.forEach((day, idx) => {
-      currentWeek.push(day);
-      if (currentWeek.length === 7 || idx === days.length - 1) {
-        weeks.push([...currentWeek]);
-        currentWeek = [];
-      }
-    });
-
     return (
-      <div className="overflow-x-auto">
-        <div className="mb-4 p-3 bg-military-olive rounded-lg">
+      <div className="space-y-4">
+        <div className="p-3 bg-military-olive rounded-lg">
           <h3 className="text-military-gold font-bold text-lg text-center">
-            {format(currentDate, "LLLL yyyy", { locale: ru })}
+            График на {format(currentDate, "LLLL yyyy", { locale: ru })}
           </h3>
+          <p className="text-military-light text-center text-sm mt-1">
+            Всего дней: {days.length}
+          </p>
         </div>
         
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-military-olive">
-              <th className="border border-military-dark p-3 text-military-light text-left sticky left-0 bg-military-olive z-10 min-w-[150px]">
-                Участник
-              </th>
-              {days.map((day, idx) => (
-                <th key={idx} className="border border-military-dark p-2 text-military-light text-center min-w-[100px]">
-                  <div className="text-xs font-bold">{format(day, "EEE", { locale: ru })}</div>
-                  <div className="text-lg font-bold">{format(day, "dd", { locale: ru })}</div>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-military-olive">
+                <th className="border border-military-dark p-3 text-military-light text-left sticky left-0 bg-military-olive z-10 min-w-[150px]">
+                  Участник
                 </th>
-              ))}
-            </tr>
-          </thead>
+                {days.map((day, idx) => {
+                  const isToday = isSameDay(day, new Date());
+                  return (
+                    <th 
+                      key={idx} 
+                      className={`border border-military-dark p-2 text-military-light text-center min-w-[90px] ${
+                        isToday ? 'bg-military-gold text-military-dark' : ''
+                      }`}
+                    >
+                      <div className="text-xs font-bold">{format(day, "EEE", { locale: ru })}</div>
+                      <div className="text-lg font-bold">{format(day, "dd", { locale: ru })}</div>
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
           <tbody>
             {groupMembers.map((member) => (
               <tr key={member.id} className="hover:bg-military-olive/30 transition-colors">
