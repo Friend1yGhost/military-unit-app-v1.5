@@ -644,15 +644,25 @@ const AdminPanel = () => {
                         </p>
                         {duty.notes && <p className="text-military-light text-xs mt-2 italic">{duty.notes}</p>}
                       </div>
-                      <Button
-                        onClick={() => handleDeleteDuty(duty.id)}
-                        variant="destructive"
-                        size="sm"
-                        className="ml-4"
-                        data-testid={`delete-duty-btn-${duty.id}`}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex gap-2 ml-4">
+                        <Button
+                          onClick={() => handleEditDuty(duty)}
+                          variant="outline"
+                          size="sm"
+                          className="border-military-olive text-military-light hover:bg-military-olive hover:text-military-gold"
+                          data-testid={`edit-duty-btn-${duty.id}`}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteDuty(duty.id)}
+                          variant="destructive"
+                          size="sm"
+                          data-testid={`delete-duty-btn-${duty.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
