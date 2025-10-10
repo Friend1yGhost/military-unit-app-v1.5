@@ -69,6 +69,10 @@ function App() {
               path="/my-duties" 
               element={user ? <MyDuties /> : <Navigate to="/login" />} 
             />
+            <Route 
+              path="/profile" 
+              element={user ? <Profile /> : <Navigate to="/login" />} 
+            />
           </Routes>
           <Toaster />
         </BrowserRouter>
