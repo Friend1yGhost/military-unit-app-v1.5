@@ -11,6 +11,31 @@ import { toast } from "sonner";
 import { Trash2, Plus, Calendar, User, Settings as SettingsIcon, Edit, X, Download } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+const RANK_CATEGORIES = {
+  "Рядовий": ["солдат", "старший солдат"],
+  "Сержантський склад": [
+    "молодший сержант",
+    "сержант",
+    "старший сержант",
+    "головний сержант",
+    "штаб-сержант",
+    "майстер-сержант",
+    "старший майстер-сержант",
+    "головний майстер-сержант"
+  ],
+  "Молодший офіцерський склад": [
+    "молодший лейтенант",
+    "лейтенант",
+    "старший лейтенант",
+    "капітан"
+  ],
+  "Старший офіцерський склад": [
+    "майор",
+    "підполковник",
+    "полковник"
+  ]
+};
+
 const AdminPanel = () => {
   const [news, setNews] = useState([]);
   const [duties, setDuties] = useState([]);
