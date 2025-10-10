@@ -178,9 +178,7 @@ const MyDuties = () => {
                   </CardContent>
                 </Card>
               ) : (
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {duties.map((duty) => {
               const upcoming = isUpcoming(duty.shift_start);
               const active = isActive(duty.shift_start, duty.shift_end);
