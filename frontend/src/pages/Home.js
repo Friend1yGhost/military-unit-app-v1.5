@@ -44,7 +44,7 @@ const Home = () => {
             Новости Части
           </h1>
           <p className="text-xl text-military-light text-center max-w-2xl mx-auto">
-            Актуальная информация и объявления военной части
+            Актуальная информация и объявления {settings.unit_name}
           </p>
         </div>
       </div>
