@@ -74,6 +74,17 @@ const Navbar = () => {
                   {user.full_name}
                 </span>
                 
+                <Link to="/profile">
+                  <Button 
+                    variant="ghost" 
+                    className="text-military-light hover:bg-military-olive hover:text-military-gold"
+                    data-testid="profile-nav-btn"
+                  >
+                    <UserIcon className="w-4 h-4 mr-2" />
+                    Профиль
+                  </Button>
+                </Link>
+
                 <Link to="/my-duties">
                   <Button 
                     variant="ghost" 
