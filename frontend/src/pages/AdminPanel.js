@@ -15,9 +15,14 @@ const AdminPanel = () => {
   const [news, setNews] = useState([]);
   const [duties, setDuties] = useState([]);
   const [users, setUsers] = useState([]);
-  const [settings, setSettings] = useState({ unit_name: "", unit_subtitle: "", unit_icon: "" });
+  const [groups, setGroups] = useState([]);
+  const [settings, setSettings] = useState({ unit_name: "", unit_subtitle: "", unit_icon: "", news_title: "", news_subtitle: "" });
   const [newsForm, setNewsForm] = useState({ title: "", content: "", image_url: "" });
   const [editingNews, setEditingNews] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
+  const [editingGroup, setEditingGroup] = useState(null);
+  const [groupForm, setGroupForm] = useState({ name: "", description: "", member_ids: [] });
+  const [userForm, setUserForm] = useState({ full_name: "", email: "", password: "", role: "user" });
   const [dutyForm, setDutyForm] = useState({
     user_id: "",
     duty_type: "",
