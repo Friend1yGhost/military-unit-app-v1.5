@@ -765,17 +765,73 @@ const AdminPanel = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="user_email" className="text-military-light">Email</Label>
+                        <Label htmlFor="user_email" className="text-military-light">
+                          Email {!editingUser && <span className="text-xs text-military-accent">(необов'язково)</span>}
+                        </Label>
                         <Input
                           id="user_email"
                           type="email"
                           value={userForm.email}
                           onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
                           className="bg-military-dark border-military-olive text-military-light"
-                          required
+                          required={!!editingUser}
+                          placeholder={!editingUser ? "Залишіть порожнім для авто-генерації" : ""}
                           data-testid="user-email-input"
                         />
                       </div>
+                    </div>
+
+                    <div className="space-y-4 p-4 bg-military-dark rounded-lg border border-military-olive">
+                      <div className="space-y-2">
+                        <Label className="text-military-light">Категорія Звання</Label>
+                        <Select 
+                          value={rankCategory} 
+                          onValueChange={(value) => {
+                            setRankCategory(value);
+                            setUserForm({ ...userForm, rank: "" });
+                          }}
+                        >
+                          <SelectTrigger className="bg-military-green border-military-olive text-military-light">
+                            <SelectValue placeholder="Оберіть категорію" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-military-dark border-military-olive">
+                            {Object.keys(RANK_CATEGORIES).map((category) => (
+                              <SelectItem key={category} value={category} className="text-military-light">
+                                {category}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {rankCategory && (
+                        <div className="space-y-2">
+                          <Label className="text-military-light">Військове Звання</Label>
+                          <Select 
+                            value={userForm.rank} 
+                            onValueChange={(value) => setUserForm({ ...userForm, rank: value })}
+                          >
+                            <SelectTrigger className="bg-military-green border-military-olive text-military-light">
+                              <SelectValue placeholder="Оберіть звання" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-military-dark border-military-olive">
+                              {RANK_CATEGORIES[rankCategory].map((rank) => (
+                                <SelectItem key={rank} value={rank} className="text-military-light">
+                                  {rank}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {userForm.rank && (
+                        <div className="p-2 bg-military-olive rounded">
+                          <p className="text-military-dark text-sm">
+                            <span className="font-semibold">Обране:</span> {userForm.rank}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
