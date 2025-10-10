@@ -51,6 +51,88 @@ const MyDuties = () => {
     return new Date(shiftStart) <= now && new Date(shiftEnd) >= now;
   };
 
+  const getDutiesForUserAndDay = (userId, date) => {
+    return allDuties.filter(duty => {
+      const dutyDate = new Date(duty.shift_start);
+      return duty.user_id === userId && isSameDay(dutyDate, date);
+    });
+  };
+
+  const renderWeekSchedule = (group) => {
+    const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+    const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+    const groupMembers = users.filter(u => group.member_ids?.includes(u.id));
+
+    return (
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-military-olive">
+              <th className="border border-military-dark p-3 text-military-light text-left sticky left-0 bg-military-olive z-10">
+                Участник
+              </th>
+              {days.map((day, idx) => (
+                <th key={idx} className="border border-military-dark p-3 text-military-light text-center min-w-[120px]">
+                  <div className="font-bold">{format(day, "EEEE", { locale: ru })}</div>
+                  <div className="text-sm text-military-accent">{format(day, "dd.MM", { locale: ru })}</div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {groupMembers.map((member) => (
+              <tr key={member.id} className="hover:bg-military-olive/30 transition-colors">
+                <td className="border border-military-olive p-3 text-military-light font-semibold sticky left-0 bg-military-green z-10">
+                  {member.full_name}
+                  {member.id === user.id && (
+                    <span className="ml-2 text-xs text-military-gold">(Вы)</span>
+                  )}
+                </td>
+                {days.map((day, dayIdx) => {
+                  const dayDuties = getDutiesForUserAndDay(member.id, day);
+                  return (
+                    <td key={dayIdx} className="border border-military-olive p-2 text-center align-top">
+                      {dayDuties.length > 0 ? (
+                        <div className="space-y-1">
+                          {dayDuties.map((duty, dutyIdx) => (
+                            <div
+                              key={dutyIdx}
+                              className={`text-xs p-2 rounded ${
+                                member.id === user.id
+                                  ? "bg-military-gold text-military-dark font-bold"
+                                  : "bg-military-dark text-military-light"
+                              }`}
+                              title={`${duty.duty_type} - ${duty.position}`}
+                            >
+                              <div className="font-semibold">{duty.duty_type}</div>
+                              <div className="text-[10px] opacity-80">{duty.position}</div>
+                              <div className="text-[10px] mt-1">
+                                {format(new Date(duty.shift_start), "HH:mm")} - {format(new Date(duty.shift_end), "HH:mm")}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-military-accent text-xs">—</span>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+            {groupMembers.length === 0 && (
+              <tr>
+                <td colSpan={8} className="border border-military-olive p-6 text-center text-military-accent">
+                  В группе пока нет участников
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-military-dark py-12">
       <div className="container mx-auto px-4">
@@ -67,12 +149,35 @@ const MyDuties = () => {
           <div className="flex justify-center items-center py-20">
             <div className="text-military-light text-xl">Загрузка...</div>
           </div>
-        ) : duties.length === 0 ? (
-          <Card className="bg-military-green border-2 border-military-olive">
-            <CardContent className="py-12 text-center">
-              <AlertCircle className="w-16 h-16 text-military-accent mx-auto mb-4" />
-              <p className="text-military-light text-xl">У вас пока нет назначенных нарядов</p>
-            </CardContent>
+        ) : (
+          <Tabs defaultValue="personal" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-military-green mb-8">
+              <TabsTrigger 
+                value="personal" 
+                className="data-[state=active]:bg-military-olive data-[state=active]:text-military-gold"
+                data-testid="personal-duties-tab"
+              >
+                Мои Наряды
+              </TabsTrigger>
+              <TabsTrigger 
+                value="group" 
+                className="data-[state=active]:bg-military-olive data-[state=active]:text-military-gold"
+                data-testid="group-schedule-tab"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                График Группы
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="personal" className="space-y-6">
+              {duties.length === 0 ? (
+                <Card className="bg-military-green border-2 border-military-olive">
+                  <CardContent className="py-12 text-center">
+                    <AlertCircle className="w-16 h-16 text-military-accent mx-auto mb-4" />
+                    <p className="text-military-light text-xl">У вас пока нет назначенных нарядов</p>
+                  </CardContent>
+                </Card>
+              ) : (
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
