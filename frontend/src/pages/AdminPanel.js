@@ -716,17 +716,31 @@ const AdminPanel = () => {
 
           {/* Users Tab */}
           <TabsContent value="users" className="space-y-8">
-            {editingUser && (
+            {(editingUser || creatingUser) && (
               <Card className="bg-military-green border-2 border-military-olive">
                 <CardHeader className="border-b border-military-olive">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-military-gold flex items-center">
-                      <Edit className="w-6 h-6 mr-2" />
-                      Редактировать Пользователя
+                      {editingUser ? (
+                        <>
+                          <Edit className="w-6 h-6 mr-2" />
+                          Редагувати Користувача
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-6 h-6 mr-2" />
+                          Створити Користувача
+                        </>
+                      )}
                     </CardTitle>
                     <Button
                       type="button"
-                      onClick={() => setEditingUser(null)}
+                      onClick={() => {
+                        setEditingUser(null);
+                        setCreatingUser(false);
+                        setUserForm({ full_name: "", email: "", password: "", rank: "", role: "user" });
+                        setRankCategory("");
+                      }}
                       variant="ghost"
                       className="text-military-light hover:text-military-accent"
                     >
