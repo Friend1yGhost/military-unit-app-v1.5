@@ -142,13 +142,14 @@ const MyDuties = () => {
             ))}
             {groupMembers.length === 0 && (
               <tr>
-                <td colSpan={8} className="border border-military-olive p-6 text-center text-military-accent">
+                <td colSpan={days.length + 1} className="border border-military-olive p-6 text-center text-military-accent">
                   В группе пока нет участников
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+        </div>
       </div>
     );
   };
