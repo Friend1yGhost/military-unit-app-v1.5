@@ -9,17 +9,22 @@ import { ru } from "date-fns/locale";
 const Home = () => {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState({ unit_name: "Военная Часть" });
 
   useEffect(() => {
-    fetchNews();
+    fetchData();
   }, []);
 
-  const fetchNews = async () => {
+  const fetchData = async () => {
     try {
-      const response = await axios.get(`${API}/news`);
-      setNews(response.data);
+      const [newsRes, settingsRes] = await Promise.all([
+        axios.get(`${API}/news`),
+        axios.get(`${API}/settings`)
+      ]);
+      setNews(newsRes.data);
+      setSettings(settingsRes.data);
     } catch (error) {
-      console.error("Error fetching news:", error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
