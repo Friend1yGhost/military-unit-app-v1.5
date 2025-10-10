@@ -15,6 +15,7 @@ const AdminPanel = () => {
   const [news, setNews] = useState([]);
   const [duties, setDuties] = useState([]);
   const [users, setUsers] = useState([]);
+  const [settings, setSettings] = useState({ unit_name: "", unit_icon: "" });
   const [newsForm, setNewsForm] = useState({ title: "", content: "", image_url: "" });
   const [dutyForm, setDutyForm] = useState({
     user_id: "",
@@ -35,15 +36,17 @@ const AdminPanel = () => {
     const config = { headers: { Authorization: `Bearer ${token}` } };
 
     try {
-      const [newsRes, dutiesRes, usersRes] = await Promise.all([
+      const [newsRes, dutiesRes, usersRes, settingsRes] = await Promise.all([
         axios.get(`${API}/news`),
         axios.get(`${API}/duties`, config),
-        axios.get(`${API}/users`, config)
+        axios.get(`${API}/users`, config),
+        axios.get(`${API}/settings`)
       ]);
 
       setNews(newsRes.data);
       setDuties(dutiesRes.data);
       setUsers(usersRes.data);
+      setSettings(settingsRes.data);
     } catch (error) {
       toast.error("Ошибка загрузки данных");
     }
