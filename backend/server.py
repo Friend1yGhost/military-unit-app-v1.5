@@ -400,6 +400,44 @@ async def create_duty(duty_data: DutyRosterCreate, current_user: User = Depends(
     await db.duties.insert_one(duty_doc)
     return duty
 
+@api_router.post("/duties/bulk")
+async def create_duties_bulk(duty_data: DutyRosterBulkCreate, current_user: User = Depends(get_admin_user)):
+    """Create multiple duties at once for selected dates"""
+    # Get user info
+    user_doc = await db.users.find_one({"id": duty_data.user_id}, {"_id": 0})
+    if not user_doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    created_duties = []
+    for date_str in duty_data.dates:
+        # Combine date with time
+        shift_start = datetime.fromisoformat(f"{date_str}T{duty_data.shift_start_time}:00")
+        shift_end = datetime.fromisoformat(f"{date_str}T{duty_data.shift_end_time}:00")
+        
+        duty = DutyRoster(
+            user_id=duty_data.user_id,
+            user_name=user_doc['full_name'],
+            duty_type=duty_data.duty_type,
+            position=duty_data.position,
+            shift_start=shift_start,
+            shift_end=shift_end,
+            rotation_cycle=duty_data.rotation_cycle,
+            notes=duty_data.notes
+        )
+        
+        duty_doc = duty.model_dump()
+        duty_doc['created_at'] = duty_doc['created_at'].isoformat()
+        duty_doc['shift_start'] = duty_doc['shift_start'].isoformat()
+        duty_doc['shift_end'] = duty_doc['shift_end'].isoformat()
+        
+        await db.duties.insert_one(duty_doc)
+        created_duties.append(duty)
+    
+    return {
+        "message": f"Створено {len(created_duties)} нарядів",
+        "count": len(created_duties)
+    }
+
 @api_router.put("/duties/{duty_id}", response_model=DutyRoster)
 async def update_duty(duty_id: str, duty_data: DutyRosterCreate, current_user: User = Depends(get_admin_user)):
     existing_duty = await db.duties.find_one({"id": duty_id}, {"_id": 0})
