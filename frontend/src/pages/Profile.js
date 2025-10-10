@@ -32,7 +32,8 @@ const Profile = () => {
     const token = localStorage.getItem("token");
     const updateData = {
       full_name: formData.full_name,
-      email: formData.email
+      email: formData.email,
+      rank: formData.rank
     };
 
     if (formData.password) {
