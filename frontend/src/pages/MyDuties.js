@@ -98,8 +98,11 @@ const MyDuties = () => {
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-military-olive">
-                <th className="border border-military-dark p-3 text-military-light text-left sticky left-0 bg-military-olive z-10 min-w-[150px]">
-                  Участник
+                <th className="border border-military-dark p-3 text-military-light text-center sticky left-0 bg-military-olive z-10 min-w-[140px]" style={{ left: 0 }}>
+                  Військове звання
+                </th>
+                <th className="border border-military-dark p-3 text-military-light text-left bg-military-olive z-10 min-w-[150px]" style={{ left: '140px', position: 'sticky' }}>
+                  ПІБ
                 </th>
                 {days.map((day, idx) => {
                   const isToday = isSameDay(day, new Date());
@@ -120,11 +123,13 @@ const MyDuties = () => {
           <tbody>
             {groupMembers.map((member) => (
               <tr key={member.id} className="hover:bg-military-olive/30 transition-colors">
-                <td className="border border-military-olive p-3 text-military-light font-semibold sticky left-0 bg-military-green z-10">
-                  <div>{member.rank && <span className="text-military-accent text-sm">{member.rank}</span>}</div>
-                  <div>{member.full_name}</div>
+                <td className="border border-military-olive p-3 text-military-light text-center sticky left-0 bg-military-green z-10" style={{ left: 0 }}>
+                  <span className="text-sm">{member.rank || "—"}</span>
+                </td>
+                <td className="border border-military-olive p-3 text-military-light font-semibold bg-military-green z-10" style={{ left: '140px', position: 'sticky' }}>
+                  {member.full_name}
                   {member.id === user.id && (
-                    <span className="text-xs text-military-gold">(Вы)</span>
+                    <span className="ml-2 text-xs text-military-gold">(Ви)</span>
                   )}
                 </td>
                 {days.map((day, dayIdx) => {
