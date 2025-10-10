@@ -222,6 +222,7 @@ async def register(user_data: UserCreate):
     user = User(
         email=user_data.email,
         full_name=user_data.full_name,
+        rank=user_data.rank,
         role="user",
         verified=True  # Auto-verify for now
     )
