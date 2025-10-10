@@ -621,7 +621,39 @@ const AdminPanel = () => {
                     <p className="text-military-accent text-sm">Подзаголовок под названием части</p>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="pt-4 border-t border-military-olive">
+                    <h3 className="text-military-gold font-semibold mb-4">Настройки Страницы Новостей</h3>
+                    
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="news_title" className="text-military-light">Заголовок Страницы Новостей</Label>
+                        <Input
+                          id="news_title"
+                          value={settings.news_title}
+                          onChange={(e) => setSettings({ ...settings, news_title: e.target.value })}
+                          className="bg-military-dark border-military-olive text-military-light"
+                          required
+                          data-testid="settings-news-title-input"
+                          placeholder="Новости Части"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="news_subtitle" className="text-military-light">Подзаголовок Страницы Новостей</Label>
+                        <Input
+                          id="news_subtitle"
+                          value={settings.news_subtitle}
+                          onChange={(e) => setSettings({ ...settings, news_subtitle: e.target.value })}
+                          className="bg-military-dark border-military-olive text-military-light"
+                          required
+                          data-testid="settings-news-subtitle-input"
+                          placeholder="Актуальная информация и объявления"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-4 border-t border-military-olive">
                     <Label htmlFor="unit_icon" className="text-military-light text-lg">URL Иконки</Label>
                     <Input
                       id="unit_icon"
