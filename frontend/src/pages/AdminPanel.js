@@ -166,6 +166,20 @@ const AdminPanel = () => {
     }
   };
 
+  const handleEditDuty = (dutyItem) => {
+    setEditingDuty(dutyItem);
+    setDutyForm({
+      user_id: dutyItem.user_id,
+      duty_type: dutyItem.duty_type,
+      position: dutyItem.position,
+      shift_start: new Date(dutyItem.shift_start).toISOString().slice(0, 16),
+      shift_end: new Date(dutyItem.shift_end).toISOString().slice(0, 16),
+      rotation_cycle: dutyItem.rotation_cycle,
+      notes: dutyItem.notes || ""
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleDeleteDuty = async (id) => {
     const token = localStorage.getItem("token");
 
