@@ -103,12 +103,39 @@ class Settings(BaseModel):
     unit_name: str = "Военная Часть"
     unit_subtitle: str = "Информационная Система"
     unit_icon: str = "https://cdn-icons-png.flaticon.com/512/2913/2913133.png"
+    news_title: str = "Новости Части"
+    news_subtitle: str = "Актуальная информация и объявления военной части"
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class SettingsUpdate(BaseModel):
     unit_name: Optional[str] = None
     unit_subtitle: Optional[str] = None
     unit_icon: Optional[str] = None
+    news_title: Optional[str] = None
+    news_subtitle: Optional[str] = None
+
+class Group(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    description: Optional[str] = None
+    member_ids: List[str] = []
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class GroupCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+class GroupUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    member_ids: Optional[List[str]] = None
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    role: Optional[str] = None
 
 # Helper functions
 def verify_password(plain_password: str, hashed_password: str) -> bool:
