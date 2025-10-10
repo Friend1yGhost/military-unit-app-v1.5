@@ -148,7 +148,7 @@ async def get_admin_user(current_user: User = Depends(get_current_user)) -> User
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
 
-# Seed admin user
+# Seed admin user and default settings
 @app.on_event("startup")
 async def seed_admin():
     admin_email = "sheremet.b.s@gmail.com"
@@ -167,6 +167,15 @@ async def seed_admin():
         
         await db.users.insert_one(admin_doc)
         logger.info(f"Admin user created: {admin_email}")
+    
+    # Seed default settings
+    existing_settings = await db.settings.find_one({"id": "military_unit_settings"})
+    if not existing_settings:
+        default_settings = Settings()
+        settings_doc = default_settings.model_dump()
+        settings_doc['updated_at'] = settings_doc['updated_at'].isoformat()
+        await db.settings.insert_one(settings_doc)
+        logger.info("Default settings created")
 
 # Auth Routes
 @api_router.post("/auth/register", response_model=User)
