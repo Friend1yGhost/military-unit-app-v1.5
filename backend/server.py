@@ -264,6 +264,8 @@ async def update_profile(user_data: UserUpdate, current_user: User = Depends(get
     
     if user_data.full_name:
         update_data['full_name'] = user_data.full_name
+    if user_data.rank is not None:
+        update_data['rank'] = user_data.rank
     if user_data.email:
         # Check if email already exists
         existing = await db.users.find_one({"email": user_data.email, "id": {"$ne": current_user.id}})
