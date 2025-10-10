@@ -403,6 +403,70 @@ const AdminPanel = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-8">
+            <Card className="bg-military-green border-2 border-military-olive">
+              <CardHeader className="border-b border-military-olive">
+                <CardTitle className="text-military-gold">Настройки Части</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <form onSubmit={handleSettingsUpdate} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="unit_name" className="text-military-light text-lg">Название Части</Label>
+                    <Input
+                      id="unit_name"
+                      value={settings.unit_name}
+                      onChange={(e) => setSettings({ ...settings, unit_name: e.target.value })}
+                      className="bg-military-dark border-military-olive text-military-light text-lg"
+                      required
+                      data-testid="settings-unit-name-input"
+                      placeholder="Военная Часть №12345"
+                    />
+                    <p className="text-military-accent text-sm">Это название будет отображаться в шапке сайта</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="unit_icon" className="text-military-light text-lg">URL Иконки</Label>
+                    <Input
+                      id="unit_icon"
+                      value={settings.unit_icon}
+                      onChange={(e) => setSettings({ ...settings, unit_icon: e.target.value })}
+                      className="bg-military-dark border-military-olive text-military-light"
+                      required
+                      data-testid="settings-unit-icon-input"
+                      placeholder="https://example.com/icon.png"
+                    />
+                    <p className="text-military-accent text-sm">Введите URL изображения для иконки части</p>
+                  </div>
+
+                  {settings.unit_icon && (
+                    <div className="space-y-2">
+                      <Label className="text-military-light">Предпросмотр Иконки</Label>
+                      <div className="p-4 bg-military-dark rounded-lg border border-military-olive flex items-center justify-center">
+                        <img 
+                          src={settings.unit_icon} 
+                          alt="Unit icon preview" 
+                          className="w-16 h-16 object-contain"
+                          onError={(e) => {
+                            e.target.src = "https://cdn-icons-png.flaticon.com/512/2913/2913133.png";
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <Button 
+                    type="submit" 
+                    className="bg-military-olive hover:bg-military-accent text-military-dark font-bold w-full py-6 text-lg"
+                    data-testid="save-settings-btn"
+                  >
+                    Сохранить Настройки
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
