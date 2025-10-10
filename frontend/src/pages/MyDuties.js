@@ -260,6 +260,60 @@ const MyDuties = () => {
               );
             })}
           </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="group" className="space-y-6">
+              {myGroups.length === 0 ? (
+                <Card className="bg-military-green border-2 border-military-olive">
+                  <CardContent className="py-12 text-center">
+                    <Users className="w-16 h-16 text-military-accent mx-auto mb-4" />
+                    <p className="text-military-light text-xl mb-2">Вы не состоите ни в одной группе</p>
+                    <p className="text-military-accent">Обратитесь к администратору для добавления в подразделение</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-6">
+                  {myGroups.map((group) => (
+                    <Card key={group.id} className="bg-military-green border-2 border-military-olive">
+                      <CardHeader className="border-b border-military-olive">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <CardTitle className="text-military-gold text-2xl mb-2">
+                              {group.name}
+                            </CardTitle>
+                            {group.description && (
+                              <p className="text-military-light text-sm">{group.description}</p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <div className="flex items-center space-x-2 text-military-accent">
+                              <Users className="w-5 h-5" />
+                              <span className="font-semibold">{group.member_ids?.length || 0} участников</span>
+                            </div>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-6">
+                        <h3 className="text-military-gold font-semibold mb-4 text-lg">
+                          График Нарядов на Неделю
+                        </h3>
+                        {renderWeekSchedule(group)}
+                        <div className="mt-4 p-4 bg-military-dark rounded-lg border border-military-olive">
+                          <p className="text-military-accent text-sm">
+                            <span className="font-semibold">Легенда:</span> Ваши наряды выделены{" "}
+                            <span className="inline-block px-2 py-1 bg-military-gold text-military-dark text-xs font-bold rounded">
+                              золотым цветом
+                            </span>
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         )}
       </div>
     </div>
