@@ -241,10 +241,13 @@ const AdminPanel = () => {
   // User management handlers
   const handleEditUser = (userItem) => {
     setEditingUser(userItem);
+    setCreatingUser(false);
+    setRankCategory("");
     setUserForm({
       full_name: userItem.full_name,
       email: userItem.email,
       password: "",
+      rank: userItem.rank || "",
       role: userItem.role
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
