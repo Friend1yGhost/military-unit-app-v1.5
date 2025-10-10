@@ -41,10 +41,10 @@ const Home = () => {
         </div>
         <div className="container mx-auto px-4 relative z-10">
           <h1 className="text-5xl md:text-6xl font-bold text-military-gold mb-4 text-center">
-            Новости Части
+            {settings.news_title || "Новости Части"}
           </h1>
           <p className="text-xl text-military-light text-center max-w-2xl mx-auto">
-            Актуальная информация и объявления {settings.unit_name}
+            {settings.news_subtitle || "Актуальная информация и объявления военной части"}
           </p>
         </div>
       </div>
