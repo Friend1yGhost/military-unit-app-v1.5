@@ -488,6 +488,20 @@ const AdminPanel = () => {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="unit_subtitle" className="text-military-light text-lg">Подзаголовок</Label>
+                    <Input
+                      id="unit_subtitle"
+                      value={settings.unit_subtitle}
+                      onChange={(e) => setSettings({ ...settings, unit_subtitle: e.target.value })}
+                      className="bg-military-dark border-military-olive text-military-light"
+                      required
+                      data-testid="settings-unit-subtitle-input"
+                      placeholder="Информационная Система"
+                    />
+                    <p className="text-military-accent text-sm">Подзаголовок под названием части</p>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="unit_icon" className="text-military-light text-lg">URL Иконки</Label>
                     <Input
                       id="unit_icon"
@@ -498,7 +512,7 @@ const AdminPanel = () => {
                       data-testid="settings-unit-icon-input"
                       placeholder="https://example.com/icon.png"
                     />
-                    <p className="text-military-accent text-sm">Введите URL изображения для иконки части</p>
+                    <p className="text-military-accent text-sm">Рекомендуемый размер: 64x64px или 128x128px (квадратная)</p>
                   </div>
 
                   {settings.unit_icon && (
