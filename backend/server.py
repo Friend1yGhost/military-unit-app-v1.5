@@ -37,6 +37,7 @@ class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     email: EmailStr
     full_name: str
+    rank: Optional[str] = None  # військове звання
     role: str = "user"  # "user" or "admin"
     verified: bool = False
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -45,6 +46,7 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     full_name: str
+    rank: Optional[str] = None
 
 class UserLogin(BaseModel):
     email: EmailStr
