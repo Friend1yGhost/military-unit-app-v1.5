@@ -168,16 +168,36 @@ const AdminPanel = () => {
 
     try {
       if (editingDuty) {
+        // Update single duty
         await axios.put(`${API}/duties/${editingDuty.id}`, dutyForm, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        toast.success("Наряд обновлен!");
+        toast.success("Наряд оновлено!");
         setEditingDuty(null);
+      } else if (bulkMode && selectedDates.length > 0) {
+        // Create multiple duties for selected dates
+        const startTime = dutyForm.shift_start.split('T')[1].substring(0, 5);
+        const endTime = dutyForm.shift_end.split('T')[1].substring(0, 5);
+        
+        await axios.post(`${API}/duties/bulk`, {
+          user_id: dutyForm.user_id,
+          duty_type: dutyForm.duty_type,
+          position: dutyForm.position,
+          dates: selectedDates,
+          shift_start_time: startTime,
+          shift_end_time: endTime,
+          rotation_cycle: dutyForm.rotation_cycle,
+          notes: dutyForm.notes
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success(`Створено ${selectedDates.length} нарядів!`);
       } else {
+        // Create single duty
         await axios.post(`${API}/duties`, dutyForm, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        toast.success("Наряд создан!");
+        toast.success("Наряд створено!");
       }
 
       setDutyForm({
@@ -189,6 +209,7 @@ const AdminPanel = () => {
         rotation_cycle: "weekly",
         notes: ""
       });
+      setSelectedDates([]);
       fetchData();
     } catch (error) {
       toast.error("Ошибка создания наряда");
