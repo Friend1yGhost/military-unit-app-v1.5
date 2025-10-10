@@ -13,6 +13,7 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     full_name: user?.full_name || "",
     email: user?.email || "",
+    rank: user?.rank || "",
     password: "",
     confirmPassword: ""
   });
