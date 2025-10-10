@@ -863,7 +863,7 @@ const AdminPanel = () => {
                     </div>
 
                     <Button type="submit" className="bg-military-olive hover:bg-military-accent text-military-dark font-bold" data-testid="save-user-btn">
-                      Сохранить Изменения
+                      {editingUser ? "Зберегти Зміни" : "Створити Користувача"}
                     </Button>
                   </form>
                 </CardContent>
