@@ -345,6 +345,49 @@ async def get_users(current_user: User = Depends(get_admin_user)):
     
     return users
 
+# Settings Routes
+@api_router.get("/settings", response_model=Settings)
+async def get_settings():
+    settings_doc = await db.settings.find_one({"id": "military_unit_settings"}, {"_id": 0})
+    
+    if not settings_doc:
+        # Return default settings if none exist
+        default_settings = Settings()
+        return default_settings
+    
+    if isinstance(settings_doc.get('updated_at'), str):
+        settings_doc['updated_at'] = datetime.fromisoformat(settings_doc['updated_at'])
+    
+    return Settings(**settings_doc)
+
+@api_router.put("/settings", response_model=Settings)
+async def update_settings(settings_data: SettingsUpdate, current_user: User = Depends(get_admin_user)):
+    update_data = {k: v for k, v in settings_data.model_dump().items() if v is not None}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No data to update")
+    
+    update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.settings.update_one(
+        {"id": "military_unit_settings"},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        # Create if doesn't exist
+        default_settings = Settings(**update_data)
+        settings_doc = default_settings.model_dump()
+        settings_doc['updated_at'] = settings_doc['updated_at'].isoformat()
+        await db.settings.insert_one(settings_doc)
+    
+    updated_settings = await db.settings.find_one({"id": "military_unit_settings"}, {"_id": 0})
+    
+    if isinstance(updated_settings['updated_at'], str):
+        updated_settings['updated_at'] = datetime.fromisoformat(updated_settings['updated_at'])
+    
+    return Settings(**updated_settings)
+
 # Include router
 app.include_router(api_router)
 
