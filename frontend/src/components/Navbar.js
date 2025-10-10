@@ -10,9 +10,11 @@ const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [settings, setSettings] = useState({ 
-    unit_name: "Военная Часть", 
+    unit_name: "Военная Часть",
+    unit_subtitle: "Информационная Система",
     unit_icon: "https://cdn-icons-png.flaticon.com/512/2913/2913133.png" 
   });
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     fetchSettings();
