@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../App";
 import { Button } from "@/components/ui/button";
-import { Shield, LogOut, LayoutDashboard, Calendar } from "lucide-react";
+import { Shield, LogOut, LayoutDashboard, Calendar, Menu, X } from "lucide-react";
 import axios from "axios";
 import { API } from "../App";
 
