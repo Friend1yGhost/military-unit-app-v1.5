@@ -138,11 +138,19 @@ const AdminPanel = () => {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.post(`${API}/duties`, dutyForm, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      if (editingDuty) {
+        await axios.put(`${API}/duties/${editingDuty.id}`, dutyForm, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success("Наряд обновлен!");
+        setEditingDuty(null);
+      } else {
+        await axios.post(`${API}/duties`, dutyForm, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success("Наряд создан!");
+      }
 
-      toast.success("Наряд создан!");
       setDutyForm({
         user_id: "",
         duty_type: "",
