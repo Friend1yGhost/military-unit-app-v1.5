@@ -94,10 +94,26 @@ const Home = () => {
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-4">
+                <CardContent className="pt-4 space-y-4">
                   <p className="text-military-light leading-relaxed" data-testid={`news-content-${item.id}`}>
                     {item.content}
                   </p>
+                  
+                  {item.is_external && item.external_url && (
+                    <div className="flex items-center justify-between pt-3 border-t border-military-olive">
+                      <span className="text-xs text-military-accent">
+                        Джерело: {item.source}
+                      </span>
+                      <Button
+                        onClick={() => window.open(item.external_url, '_blank')}
+                        className="bg-military-accent hover:bg-military-gold text-military-dark font-semibold"
+                        data-testid={`full-news-btn-${item.id}`}
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Повна новина
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
