@@ -131,6 +131,78 @@ const Navbar = () => {
             )}
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 border-t border-military-olive">
+            <div className="flex flex-col space-y-3 pt-4">
+              {user ? (
+                <>
+                  <div className="text-military-light text-sm px-2 pb-2 border-b border-military-olive">
+                    {user.full_name}
+                  </div>
+                  
+                  <Link to="/my-duties" onClick={() => setMobileMenuOpen(false)}>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start text-military-light hover:bg-military-olive hover:text-military-gold"
+                      data-testid="my-duties-mobile-btn"
+                    >
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Мои Наряды
+                    </Button>
+                  </Link>
+
+                  {user.role === "admin" && (
+                    <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start text-military-gold hover:bg-military-olive"
+                        data-testid="admin-panel-mobile-btn"
+                      >
+                        <LayoutDashboard className="w-4 h-4 mr-2" />
+                        Админ Панель
+                      </Button>
+                    </Link>
+                  )}
+
+                  <Button 
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                    variant="outline"
+                    className="w-full justify-start border-military-olive text-military-light hover:bg-military-dark hover:border-military-accent"
+                    data-testid="logout-mobile-btn"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Выход
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                    <Button 
+                      variant="outline"
+                      className="w-full border-military-olive text-military-light hover:bg-military-olive hover:text-military-gold"
+                      data-testid="login-mobile-btn"
+                    >
+                      Вход
+                    </Button>
+                  </Link>
+                  <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
+                    <Button 
+                      className="w-full bg-military-olive hover:bg-military-accent text-military-dark font-semibold"
+                      data-testid="register-mobile-btn"
+                    >
+                      Регистрация
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
