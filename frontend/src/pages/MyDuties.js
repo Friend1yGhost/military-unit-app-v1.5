@@ -313,10 +313,7 @@ const MyDuties = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="pt-6">
-                        <h3 className="text-military-gold font-semibold mb-4 text-lg">
-                          График Нарядов на Неделю
-                        </h3>
-                        {renderWeekSchedule(group)}
+                        {renderMonthSchedule(group)}
                         <div className="mt-4 p-4 bg-military-dark rounded-lg border border-military-olive">
                           <p className="text-military-accent text-sm">
                             <span className="font-semibold">Легенда:</span> Ваши наряды выделены{" "}
