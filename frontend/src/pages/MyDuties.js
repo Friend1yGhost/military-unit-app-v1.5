@@ -103,35 +103,25 @@ const MyDuties = () => {
             {groupMembers.map((member) => (
               <tr key={member.id} className="hover:bg-military-olive/30 transition-colors">
                 <td className="border border-military-olive p-3 text-military-light font-semibold sticky left-0 bg-military-green z-10">
-                  {member.full_name}
+                  <div>{member.rank && <span className="text-military-accent text-sm">{member.rank}</span>}</div>
+                  <div>{member.full_name}</div>
                   {member.id === user.id && (
-                    <span className="ml-2 text-xs text-military-gold">(Вы)</span>
+                    <span className="text-xs text-military-gold">(Вы)</span>
                   )}
                 </td>
                 {days.map((day, dayIdx) => {
                   const dayDuties = getDutiesForUserAndDay(member.id, day);
                   return (
-                    <td key={dayIdx} className="border border-military-olive p-2 text-center align-top">
+                    <td key={dayIdx} className="border border-military-olive p-1 text-center">
                       {dayDuties.length > 0 ? (
-                        <div className="space-y-1">
-                          {dayDuties.map((duty, dutyIdx) => (
-                            <div
-                              key={dutyIdx}
-                              className={`text-xs p-2 rounded ${
-                                member.id === user.id
-                                  ? "bg-military-gold text-military-dark font-bold"
-                                  : "bg-military-dark text-military-light"
-                              }`}
-                              title={`${duty.duty_type} - ${duty.position}`}
-                            >
-                              <div className="font-semibold">{duty.duty_type}</div>
-                              <div className="text-[10px] opacity-80">{duty.position}</div>
-                              <div className="text-[10px] mt-1">
-                                {format(new Date(duty.shift_start), "HH:mm")} - {format(new Date(duty.shift_end), "HH:mm")}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                        <div 
+                          className={`w-10 h-10 mx-auto rounded ${
+                            member.id === user.id
+                              ? "bg-military-gold"
+                              : "bg-green-700"
+                          }`}
+                          title={dayDuties.map(d => `${d.duty_type} - ${d.position}\n${format(new Date(d.shift_start), "HH:mm")} - ${format(new Date(d.shift_end), "HH:mm")}`).join('\n\n')}
+                        />
                       ) : (
                         <span className="text-military-accent text-xs">—</span>
                       )}
