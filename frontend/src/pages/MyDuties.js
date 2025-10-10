@@ -2,29 +2,41 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { API, AuthContext } from "../App";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Clock, MapPin, AlertCircle } from "lucide-react";
-import { format } from "date-fns";
+import { Calendar, Clock, MapPin, AlertCircle, Users } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { format, startOfWeek, addDays, isSameDay } from "date-fns";
 import { ru } from "date-fns/locale";
 
 const MyDuties = () => {
   const [duties, setDuties] = useState([]);
+  const [myGroups, setMyGroups] = useState([]);
+  const [allDuties, setAllDuties] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    fetchDuties();
+    fetchData();
   }, []);
 
-  const fetchDuties = async () => {
+  const fetchData = async () => {
     const token = localStorage.getItem("token");
+    const config = { headers: { Authorization: `Bearer ${token}` } };
 
     try {
-      const response = await axios.get(`${API}/duties/my`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setDuties(response.data);
+      const [dutiesRes, groupsRes, allDutiesRes, usersRes] = await Promise.all([
+        axios.get(`${API}/duties/my`, config),
+        axios.get(`${API}/groups/my`, config),
+        axios.get(`${API}/duties`, config),
+        axios.get(`${API}/users`, config).catch(() => ({ data: [] }))
+      ]);
+
+      setDuties(dutiesRes.data);
+      setMyGroups(groupsRes.data);
+      setAllDuties(allDutiesRes.data);
+      setUsers(usersRes.data);
     } catch (error) {
-      console.error("Error fetching duties:", error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
