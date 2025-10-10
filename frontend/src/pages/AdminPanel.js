@@ -482,10 +482,35 @@ const AdminPanel = () => {
           <TabsContent value="duties" className="space-y-8">
             <Card className="bg-military-green border-2 border-military-olive">
               <CardHeader className="border-b border-military-olive">
-                <CardTitle className="text-military-gold flex items-center">
-                  <Plus className="w-6 h-6 mr-2" />
-                  Создать Наряд
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-military-gold flex items-center">
+                    {editingDuty ? (
+                      <>
+                        <Edit className="w-6 h-6 mr-2" />
+                        Редактировать Наряд
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-6 h-6 mr-2" />
+                        Создать Наряд
+                      </>
+                    )}
+                  </CardTitle>
+                  {editingDuty && (
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        setEditingDuty(null);
+                        setDutyForm({ user_id: "", duty_type: "", position: "", shift_start: "", shift_end: "", rotation_cycle: "weekly", notes: "" });
+                      }}
+                      variant="ghost"
+                      className="text-military-light hover:text-military-accent"
+                    >
+                      <X className="w-5 h-5 mr-1" />
+                      Отменить
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
               <CardContent className="pt-6">
                 <form onSubmit={handleDutySubmit} className="space-y-4">
