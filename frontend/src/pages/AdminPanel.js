@@ -149,12 +149,15 @@ const AdminPanel = () => {
         </h1>
 
         <Tabs defaultValue="news" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-military-green mb-8">
+          <TabsList className="grid w-full grid-cols-3 bg-military-green mb-8">
             <TabsTrigger value="news" className="data-[state=active]:bg-military-olive data-[state=active]:text-military-gold" data-testid="news-tab">
               Новости
             </TabsTrigger>
             <TabsTrigger value="duties" className="data-[state=active]:bg-military-olive data-[state=active]:text-military-gold" data-testid="duties-tab">
               Наряды
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="data-[state=active]:bg-military-olive data-[state=active]:text-military-gold" data-testid="settings-tab">
+              Настройки
             </TabsTrigger>
           </TabsList>
 
