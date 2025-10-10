@@ -52,12 +52,22 @@ const Navbar = () => {
               <Shield className="w-8 h-8 text-military-gold" style={{ display: 'none' }} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-military-light">{settings.unit_name}</h1>
-              <p className="text-xs text-military-accent">Информационная Система</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-military-light">{settings.unit_name}</h1>
+              <p className="text-xs text-military-accent">{settings.unit_subtitle}</p>
             </div>
           </Link>
 
-          <div className="flex items-center space-x-4">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-military-light hover:bg-military-olive rounded-lg transition-colors"
+            data-testid="mobile-menu-btn"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <>
                 <span className="text-military-light text-sm hidden md:block">
