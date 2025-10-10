@@ -102,6 +102,21 @@ const AdminPanel = () => {
     setNewsForm({ title: "", content: "", image_url: "" });
   };
 
+  const handleSyncArmyInform = async () => {
+    const token = localStorage.getItem("token");
+    
+    try {
+      const response = await axios.post(`${API}/news/sync-armyinform`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success(response.data.message || "Новости синхронизированы!");
+      fetchData();
+    } catch (error) {
+      toast.error("Ошибка синхронизации новостей");
+    }
+  };
+
   const handleDeleteNews = async (id) => {
     const token = localStorage.getItem("token");
 
