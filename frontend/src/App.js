@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import AdminPanel from "./pages/AdminPanel";
 import MyDuties from "./pages/MyDuties";
+import Profile from "./pages/Profile";
 import Navbar from "./components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 
