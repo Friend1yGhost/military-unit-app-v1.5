@@ -124,6 +124,23 @@ const AdminPanel = () => {
     }
   };
 
+  const handleSettingsUpdate = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    try {
+      await axios.put(`${API}/settings`, settings, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      toast.success("Настройки обновлены!");
+      // Refresh to update navbar
+      window.location.reload();
+    } catch (error) {
+      toast.error("Ошибка обновления настроек");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-military-dark py-12">
       <div className="container mx-auto px-4">
