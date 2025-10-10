@@ -1,12 +1,31 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../App";
 import { Button } from "@/components/ui/button";
 import { Shield, LogOut, LayoutDashboard, Calendar } from "lucide-react";
+import axios from "axios";
+import { API } from "../App";
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [settings, setSettings] = useState({ 
+    unit_name: "Военная Часть", 
+    unit_icon: "https://cdn-icons-png.flaticon.com/512/2913/2913133.png" 
+  });
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    try {
+      const response = await axios.get(`${API}/settings`);
+      setSettings(response.data);
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -19,10 +38,19 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="p-2 bg-military-dark rounded-lg group-hover:bg-military-olive transition-colors">
-              <Shield className="w-8 h-8 text-military-gold" />
+              <img 
+                src={settings.unit_icon} 
+                alt="Unit icon"
+                className="w-8 h-8 object-contain"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <Shield className="w-8 h-8 text-military-gold" style={{ display: 'none' }} />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-military-light">Военная Часть</h1>
+              <h1 className="text-2xl font-bold text-military-light">{settings.unit_name}</h1>
               <p className="text-xs text-military-accent">Информационная Система</p>
             </div>
           </Link>
