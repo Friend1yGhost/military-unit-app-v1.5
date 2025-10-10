@@ -129,16 +129,57 @@ const Profile = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="rank" className="text-military-light">Військове Звання</Label>
-                <Input
-                  id="rank"
-                  value={formData.rank}
-                  onChange={(e) => setFormData({ ...formData, rank: e.target.value })}
-                  className="bg-military-dark border-military-olive text-military-light"
-                  placeholder="Наприклад: Солдат, Сержант, Лейтенант..."
-                  data-testid="profile-rank-input"
-                />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-military-light">Категорія Звання</Label>
+                  <Select 
+                    value={rankCategory} 
+                    onValueChange={(value) => {
+                      setRankCategory(value);
+                      setFormData({ ...formData, rank: "" });
+                    }}
+                  >
+                    <SelectTrigger className="bg-military-dark border-military-olive text-military-light" data-testid="rank-category-select">
+                      <SelectValue placeholder="Оберіть категорію" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-military-dark border-military-olive">
+                      {Object.keys(RANK_CATEGORIES).map((category) => (
+                        <SelectItem key={category} value={category} className="text-military-light">
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {rankCategory && (
+                  <div className="space-y-2">
+                    <Label className="text-military-light">Військове Звання</Label>
+                    <Select 
+                      value={formData.rank} 
+                      onValueChange={(value) => setFormData({ ...formData, rank: value })}
+                    >
+                      <SelectTrigger className="bg-military-dark border-military-olive text-military-light" data-testid="rank-select">
+                        <SelectValue placeholder="Оберіть звання" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-military-dark border-military-olive">
+                        {RANK_CATEGORIES[rankCategory].map((rank) => (
+                          <SelectItem key={rank} value={rank} className="text-military-light">
+                            {rank}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {formData.rank && (
+                  <div className="p-3 bg-military-olive rounded-lg">
+                    <p className="text-military-dark text-sm">
+                      <span className="font-semibold">Обране звання:</span> {formData.rank}
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 border-t border-military-olive">
