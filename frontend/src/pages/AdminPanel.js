@@ -282,15 +282,25 @@ const AdminPanel = () => {
                         <p className="text-military-light text-sm mb-2">{item.content}</p>
                         <p className="text-military-accent text-xs">Автор: {item.author_name}</p>
                       </div>
-                      <Button
-                        onClick={() => handleDeleteNews(item.id)}
-                        variant="destructive"
-                        size="sm"
-                        className="ml-4"
-                        data-testid={`delete-news-btn-${item.id}`}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <div className="flex gap-2 ml-4">
+                        <Button
+                          onClick={() => handleEditNews(item)}
+                          variant="outline"
+                          size="sm"
+                          className="border-military-olive text-military-light hover:bg-military-olive hover:text-military-gold"
+                          data-testid={`edit-news-btn-${item.id}`}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteNews(item.id)}
+                          variant="destructive"
+                          size="sm"
+                          data-testid={`delete-news-btn-${item.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
