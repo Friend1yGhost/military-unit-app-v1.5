@@ -191,10 +191,33 @@ const AdminPanel = () => {
           <TabsContent value="news" className="space-y-8">
             <Card className="bg-military-green border-2 border-military-olive">
               <CardHeader className="border-b border-military-olive">
-                <CardTitle className="text-military-gold flex items-center">
-                  <Plus className="w-6 h-6 mr-2" />
-                  Опубликовать Новость
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-military-gold flex items-center">
+                    {editingNews ? (
+                      <>
+                        <Edit className="w-6 h-6 mr-2" />
+                        Редактировать Новость
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-6 h-6 mr-2" />
+                        Опубликовать Новость
+                      </>
+                    )}
+                  </CardTitle>
+                  {editingNews && (
+                    <Button
+                      type="button"
+                      onClick={handleCancelEdit}
+                      variant="ghost"
+                      className="text-military-light hover:text-military-accent"
+                      data-testid="cancel-edit-btn"
+                    >
+                      <X className="w-5 h-5 mr-1" />
+                      Отменить
+                    </Button>
+                  )}
+                </div>
               </CardHeader>
               <CardContent className="pt-6">
                 <form onSubmit={handleNewsSubmit} className="space-y-4">
