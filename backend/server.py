@@ -63,6 +63,9 @@ class News(BaseModel):
     image_url: Optional[str] = None
     author_id: str
     author_name: str
+    is_external: bool = False
+    external_url: Optional[str] = None
+    source: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class NewsCreate(BaseModel):
