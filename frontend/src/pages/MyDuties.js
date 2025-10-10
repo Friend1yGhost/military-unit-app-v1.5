@@ -117,8 +117,8 @@ const MyDuties = () => {
                         <div 
                           className={`w-10 h-10 mx-auto rounded ${
                             member.id === user.id
-                              ? "bg-military-gold"
-                              : "bg-green-700"
+                              ? "bg-green-600"
+                              : "bg-black"
                           }`}
                           title={dayDuties.map(d => `${d.duty_type} - ${d.position}\n${format(new Date(d.shift_start), "HH:mm")} - ${format(new Date(d.shift_end), "HH:mm")}`).join('\n\n')}
                         />
