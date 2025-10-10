@@ -47,8 +47,10 @@ const AdminPanel = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [editingGroup, setEditingGroup] = useState(null);
   const [editingDuty, setEditingDuty] = useState(null);
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [rankCategory, setRankCategory] = useState("");
   const [groupForm, setGroupForm] = useState({ name: "", description: "", member_ids: [] });
-  const [userForm, setUserForm] = useState({ full_name: "", email: "", password: "", role: "user" });
+  const [userForm, setUserForm] = useState({ full_name: "", email: "", password: "", rank: "", role: "user" });
   const [dutyForm, setDutyForm] = useState({
     user_id: "",
     duty_type: "",
