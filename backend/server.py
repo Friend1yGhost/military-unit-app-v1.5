@@ -403,7 +403,7 @@ async def create_duties_bulk(duty_data: DutyRosterBulkCreate, current_user: User
     }
 
 @api_router.put("/duties/user/{user_id}")
-async def update_user_duties(user_id: str, dates: List[str], current_user: User = Depends(get_admin_user)):
+async def update_user_duties(user_id: str, duty_update: UserDutiesUpdate, current_user: User = Depends(get_admin_user)):
     """Update duties for a specific user - replace all duties with new dates"""
     # Get user info
     user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
@@ -415,7 +415,7 @@ async def update_user_duties(user_id: str, dates: List[str], current_user: User 
     
     # Create new duties
     created_count = 0
-    for date_str in dates:
+    for date_str in duty_update.dates:
         duty = DutyRoster(
             user_id=user_id,
             user_name=user_doc['full_name'],
