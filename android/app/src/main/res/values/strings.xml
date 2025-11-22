@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">222 ЦАПБ</string>
+    <string name="title_activity_main">222 ЦАПБ</string>
+    <string name="package_name">com.troop.manager</string>
+    <string name="custom_url_scheme">com.troop.manager</string>
+</resources>
