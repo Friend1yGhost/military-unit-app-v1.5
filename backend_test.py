@@ -268,6 +268,102 @@ class MilitaryAppTester:
         )
         return success
 
+    def test_bulk_duty_creation(self):
+        """Test bulk duty creation endpoint - main focus of this test"""
+        if not self.admin_token:
+            print("❌ No admin token available for bulk duty creation")
+            return False
+            
+        # First get users to find a user_id
+        success, users_response = self.run_test(
+            "Get Users for Bulk Duty",
+            "GET",
+            "users",
+            200,
+            headers={"Authorization": f"Bearer {self.admin_token}"}
+        )
+        
+        if not success or not users_response or len(users_response) == 0:
+            print("❌ No users available for bulk duty creation")
+            return False
+            
+        # Use the first non-admin user, or create test user if needed
+        target_user = None
+        for user in users_response:
+            if user.get('role') != 'admin':
+                target_user = user
+                break
+        
+        if not target_user:
+            # Use admin user if no regular users exist
+            target_user = users_response[0]
+            
+        user_id = target_user['id']
+        print(f"   Using user: {target_user['full_name']} (ID: {user_id})")
+        
+        # Test bulk duty creation with the specific format from the review request
+        success, response = self.run_test(
+            "Bulk Duty Creation",
+            "POST",
+            "duties/bulk",
+            200,
+            data={
+                "user_id": user_id,
+                "duty_type": "Караул",
+                "position": "Пост №1",
+                "dates": ["2025-01-15", "2025-01-16", "2025-01-17"],
+                "shift_start_time": "08:00",
+                "shift_end_time": "20:00",
+                "rotation_cycle": "daily",
+                "notes": "Тестовий наряд"
+            },
+            headers={"Authorization": f"Bearer {self.admin_token}"}
+        )
+        
+        if success:
+            print(f"   ✅ Bulk creation successful: {response.get('message', 'No message')}")
+            print(f"   ✅ Created duties count: {response.get('count', 'Unknown')}")
+            
+            # Verify the duties were actually created by checking the duties list
+            verify_success, duties_response = self.run_test(
+                "Verify Created Duties",
+                "GET",
+                "duties",
+                200,
+                headers={"Authorization": f"Bearer {self.admin_token}"}
+            )
+            
+            if verify_success and duties_response:
+                # Check if we can find duties for our test dates
+                created_duties = []
+                for duty in duties_response:
+                    if (duty.get('user_id') == user_id and 
+                        duty.get('duty_type') == 'Караул' and 
+                        duty.get('position') == 'Пост №1'):
+                        created_duties.append(duty)
+                        
+                print(f"   ✅ Found {len(created_duties)} matching duties in the system")
+                
+                # Check date/time format
+                if created_duties:
+                    sample_duty = created_duties[0]
+                    print(f"   ✅ Sample duty shift_start: {sample_duty.get('shift_start')}")
+                    print(f"   ✅ Sample duty shift_end: {sample_duty.get('shift_end')}")
+                    
+                    # Verify the time format is correct (should contain the times we specified)
+                    shift_start = sample_duty.get('shift_start', '')
+                    shift_end = sample_duty.get('shift_end', '')
+                    
+                    if '08:00' in shift_start and '20:00' in shift_end:
+                        print("   ✅ Date/time formatting is correct")
+                        return True
+                    else:
+                        print(f"   ❌ Date/time formatting issue - start: {shift_start}, end: {shift_end}")
+                        return False
+                        
+            return True
+        return False
+
 def main():
     print("🚀 Starting Military Unit Application API Tests")
     print("=" * 60)
