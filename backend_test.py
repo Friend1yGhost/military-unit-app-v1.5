@@ -68,30 +68,16 @@ class MilitaryAppTester:
             return False, {}
 
     def test_admin_login(self):
-        """Test admin login with provided credentials"""
-        # Try the credentials from review request first
+        """Test admin login with provided credentials from review request"""
+        # Use the credentials from review request
         success, response = self.run_test(
             "Admin Login (Review Request Credentials)",
             "POST",
             "auth/login",
             200,
-            data={"email": "admin@troop.mil", "password": "admin123"}
-        )
-        
-        if success and 'access_token' in response:
-            self.admin_token = response['access_token']
-            print(f"   Admin token obtained: {self.admin_token[:20]}...")
-            return True
-        
-        # Fallback to existing admin credentials
-        print("   Trying fallback admin credentials...")
-        success, response = self.run_test(
-            "Admin Login (Fallback Credentials)",
-            "POST",
-            "auth/login",
-            200,
             data={"email": "sheremet.b.s@gmail.com", "password": "8662196415q"}
         )
+        
         if success and 'access_token' in response:
             self.admin_token = response['access_token']
             print(f"   Admin token obtained: {self.admin_token[:20]}...")
