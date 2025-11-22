@@ -107,15 +107,18 @@ user_problem_statement: "Помилка створення наряду при �
 backend:
   - task: "Bulk duty creation endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint /api/duties/bulk вже реалізований. Потрібно перевірити чи правильно обробляються дані з фронтенду."
+      - working: true
+        agent: "testing"
+        comment: "✅ BULK DUTY CREATION TEST PASSED: Successfully tested POST /api/duties/bulk endpoint. Admin authentication works (using sheremet.b.s@gmail.com/8662196415q). Retrieved users list successfully. Created 3 duties for dates 2025-01-15, 2025-01-16, 2025-01-17 with times 08:00-20:00. Date/time formatting is correct (ISO format: 2025-01-15T08:00:00). All duties properly stored in database. API returns correct response: 'Створено 3 нарядів' with count: 3."
 
 frontend:
   - task: "Mass duty creation form - date/time handling"
