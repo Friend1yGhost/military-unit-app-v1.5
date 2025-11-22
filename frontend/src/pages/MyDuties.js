@@ -60,19 +60,13 @@ const MyDuties = () => {
     }
   };
 
-  const isUpcoming = (shiftStart) => {
-    return new Date(shiftStart) > new Date();
-  };
-
-  const isActive = (shiftStart, shiftEnd) => {
-    const now = new Date();
-    return new Date(shiftStart) <= now && new Date(shiftEnd) >= now;
+  const isUpcoming = (dutyDate) => {
+    return new Date(dutyDate) > new Date();
   };
 
   const getDutiesForUserAndDay = (userId, date) => {
     return allDuties.filter(duty => {
-      const dutyDate = new Date(duty.shift_start);
-      return duty.user_id === userId && isSameDay(dutyDate, date);
+      return duty.user_id === userId && duty.duty_date === format(date, "yyyy-MM-dd");
     });
   };
 
