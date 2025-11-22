@@ -543,14 +543,17 @@ def main():
     
     tester = MilitaryAppTester()
     
-    # Test sequence - focusing on bulk duty creation as per review request
+    # Test sequence - NEW duty system endpoints as per review request
     tests = [
-        ("Admin Authentication", tester.test_admin_login),
-        ("Get Current User", tester.test_get_me),
-        ("Get Users (Admin)", tester.test_get_users),
-        ("Get All Duties (Before)", tester.test_get_duties),
-        ("🎯 BULK DUTY CREATION (MAIN TEST)", tester.test_bulk_duty_creation),
-        ("Get All Duties (After)", tester.test_get_duties),
+        ("1. Admin Authentication", tester.test_admin_login),
+        ("2. Get Current User", tester.test_get_me),
+        ("3. Get Groups", tester.test_get_groups),
+        ("4. Get Group Members", tester.test_get_group_members),
+        ("5. 🎯 NEW Bulk Duty Creation", tester.test_new_bulk_duty_creation),
+        ("6. Get User Duties", tester.test_get_user_duties),
+        ("7. Update User Duties", tester.test_update_user_duties),
+        ("8. Delete User Duties", tester.test_delete_user_duties),
+        ("9. Get All Duties (Structure Check)", tester.test_get_all_duties_structure),
     ]
     
     # Run tests
