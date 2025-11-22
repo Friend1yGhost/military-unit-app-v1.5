@@ -4,7 +4,7 @@ import json
 from datetime import datetime, timedelta
 
 class MilitaryAppTester:
-    def __init__(self, base_url="https://troop-manager-3.preview.emergentagent.com"):
+    def __init__(self, base_url="https://two22-tsapb.onrender.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.admin_token = None
