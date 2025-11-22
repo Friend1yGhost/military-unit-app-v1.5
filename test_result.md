@@ -153,7 +153,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "New duty model and endpoints"
     - "New duty creation interface"
     - "MyDuties page updates"
   stuck_tasks: []
