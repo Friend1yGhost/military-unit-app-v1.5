@@ -137,7 +137,7 @@ const MyDuties = () => {
                               ? "bg-green-600"
                               : "bg-black"
                           }`}
-                          title={dayDuties.map(d => `${d.duty_type} - ${d.position}\n${format(new Date(d.shift_start), "HH:mm")} - ${format(new Date(d.shift_end), "HH:mm")}`).join('\n\n')}
+                          title={`Наряд: ${format(day, "dd.MM.yyyy")}`}
                         />
                       ) : (
                         <span className="text-military-accent text-xs">—</span>
