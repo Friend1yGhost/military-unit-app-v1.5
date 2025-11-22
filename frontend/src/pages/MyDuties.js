@@ -208,16 +208,13 @@ const MyDuties = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {duties.map((duty) => {
-              const upcoming = isUpcoming(duty.shift_start);
-              const active = isActive(duty.shift_start, duty.shift_end);
+              const upcoming = isUpcoming(duty.duty_date);
 
               return (
                 <Card
                   key={duty.id}
                   className={`bg-military-green border-2 transition-all duration-300 hover:shadow-xl ${
-                    active
-                      ? "border-military-gold shadow-lg shadow-military-gold/50"
-                      : upcoming
+                    upcoming
                       ? "border-military-accent"
                       : "border-military-olive"
                   }`}
@@ -226,22 +223,13 @@ const MyDuties = () => {
                   <CardHeader className="border-b border-military-olive pb-4">
                     <div className="flex items-center justify-between mb-2">
                       <CardTitle className="text-military-gold text-xl" data-testid={`duty-type-${duty.id}`}>
-                        {duty.duty_type}
+                        Наряд
                       </CardTitle>
-                      {active && (
-                        <span className="px-3 py-1 bg-military-gold text-military-dark text-xs font-bold rounded-full animate-pulse">
-                          АКТИВНО
-                        </span>
-                      )}
-                      {upcoming && !active && (
+                      {upcoming && (
                         <span className="px-3 py-1 bg-military-accent text-military-dark text-xs font-bold rounded-full">
                           СКОРО
                         </span>
                       )}
-                    </div>
-                    <div className="flex items-center space-x-2 text-military-accent text-sm">
-                      <MapPin className="w-4 h-4" />
-                      <span data-testid={`duty-position-${duty.id}`}>{duty.position}</span>
                     </div>
                   </CardHeader>
 
@@ -249,30 +237,11 @@ const MyDuties = () => {
                     <div className="flex items-start space-x-2 text-military-light">
                       <Calendar className="w-4 h-4 mt-1 text-military-accent" />
                       <div className="text-sm">
-                        <p className="font-semibold mb-1">Начало:</p>
-                        <p data-testid={`duty-start-${duty.id}`}>
-                          {format(new Date(duty.shift_start), "dd MMMM yyyy, HH:mm", { locale: ru })}
+                        <p className="font-semibold mb-1">Дата:</p>
+                        <p data-testid={`duty-date-${duty.id}`}>
+                          {format(new Date(duty.duty_date), "dd MMMM yyyy", { locale: ru })}
                         </p>
                       </div>
-                    </div>
-
-                    <div className="flex items-start space-x-2 text-military-light">
-                      <Clock className="w-4 h-4 mt-1 text-military-accent" />
-                      <div className="text-sm">
-                        <p className="font-semibold mb-1">Конец:</p>
-                        <p data-testid={`duty-end-${duty.id}`}>
-                          {format(new Date(duty.shift_end), "dd MMMM yyyy, HH:mm", { locale: ru })}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="pt-2 border-t border-military-olive">
-                      <p className="text-military-accent text-xs font-semibold mb-1">Ротация:</p>
-                      <p className="text-military-light text-sm" data-testid={`duty-rotation-${duty.id}`}>
-                        {duty.rotation_cycle === "daily" && "Ежедневно"}
-                        {duty.rotation_cycle === "weekly" && "Еженедельно"}
-                        {duty.rotation_cycle === "monthly" && "Ежемесячно"}
-                      </p>
                     </div>
 
                     {duty.notes && (
