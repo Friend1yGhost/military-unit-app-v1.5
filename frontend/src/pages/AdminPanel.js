@@ -157,62 +157,124 @@ const AdminPanel = () => {
     }
   };
 
+  // Fetch group members when group is selected
+  const handleGroupSelectForDuties = async (groupId) => {
+    setSelectedGroupForDuties(groupId);
+    
+    if (!groupId) {
+      setGroupMembers([]);
+      setDutyAssignments({});
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    try {
+      // Get group members
+      const response = await axios.get(`${API}/groups/${groupId}/members`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const members = response.data;
+      setGroupMembers(members);
+      
+      // Fetch existing duties for these members
+      const dutiesResponse = await axios.get(`${API}/duties`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const allDuties = dutiesResponse.data;
+      
+      // Group duties by user_id
+      const assignments = {};
+      members.forEach(member => {
+        const userDuties = allDuties.filter(d => d.user_id === member.id);
+        assignments[member.id] = userDuties.map(d => d.duty_date);
+      });
+      
+      setDutyAssignments(assignments);
+    } catch (error) {
+      toast.error("Помилка завантаження членів групи");
+    }
+  };
+
+  // Toggle duty for a specific user and date
+  const toggleDuty = (userId, date) => {
+    setDutyAssignments(prev => {
+      const userDuties = prev[userId] || [];
+      const hasDate = userDuties.includes(date);
+      
+      return {
+        ...prev,
+        [userId]: hasDate 
+          ? userDuties.filter(d => d !== date)
+          : [...userDuties, date]
+      };
+    });
+  };
+
+  // Submit bulk duties
   const handleDutySubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
 
     try {
-      if (editingDuty) {
-        // Update single duty
-        await axios.put(`${API}/duties/${editingDuty.id}`, dutyForm, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        toast.success("Наряд оновлено!");
-        setEditingDuty(null);
-      } else if (bulkMode && selectedDates.length > 0) {
-        // Create multiple duties for selected dates
-        // Handle both time format "HH:MM" and datetime-local format "YYYY-MM-DDTHH:MM"
-        const startTime = dutyForm.shift_start.includes('T') 
-          ? dutyForm.shift_start.split('T')[1].substring(0, 5)
-          : dutyForm.shift_start;
-        const endTime = dutyForm.shift_end.includes('T')
-          ? dutyForm.shift_end.split('T')[1].substring(0, 5)
-          : dutyForm.shift_end;
-        
-        await axios.post(`${API}/duties/bulk`, {
-          user_id: dutyForm.user_id,
-          duty_type: dutyForm.duty_type,
-          position: dutyForm.position,
-          dates: selectedDates,
-          shift_start_time: startTime,
-          shift_end_time: endTime,
-          rotation_cycle: dutyForm.rotation_cycle,
-          notes: dutyForm.notes
-        }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        toast.success(`Створено ${selectedDates.length} нарядів!`);
-      } else {
-        // Create single duty
-        await axios.post(`${API}/duties`, dutyForm, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        toast.success("Наряд створено!");
-      }
+      // Prepare duties array
+      const duties = Object.entries(dutyAssignments).map(([user_id, dates]) => ({
+        user_id,
+        dates
+      }));
 
-      setDutyForm({
-        user_id: "",
-        duty_type: "",
-        position: "",
-        shift_start: "",
-        shift_end: "",
-        rotation_cycle: "weekly",
-        notes: ""
+      await axios.post(`${API}/duties/bulk`, {
+        duties
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      setSelectedDates([]);
+
+      toast.success("Наряди створено!");
+      fetchData();
+      handleGroupSelectForDuties(selectedGroupForDuties); // Refresh
+    } catch (error) {
+      toast.error("Помилка створення нарядів");
+    }
+  };
+
+  // Edit user duties
+  const handleEditUserDuties = async (userId) => {
+    const token = localStorage.getItem("token");
+    
+    try {
+      const response = await axios.get(`${API}/duties/user/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const userDuties = response.data.map(d => d.duty_date);
+      setEditingUserDuties(userId);
+      setDutyAssignments({ [userId]: userDuties });
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      toast.error("Помилка завантаження нарядів");
+    }
+  };
+
+  // Save user duties after editing
+  const handleSaveUserDuties = async () => {
+    if (!editingUserDuties) return;
+    
+    const token = localStorage.getItem("token");
+    const dates = dutyAssignments[editingUserDuties] || [];
+
+    try {
+      await axios.put(`${API}/duties/user/${editingUserDuties}`, dates, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      toast.success("Наряди оновлено!");
+      setEditingUserDuties(null);
+      setDutyAssignments({});
       fetchData();
     } catch (error) {
-      toast.error("Ошибка создания наряда");
+      toast.error("Помилка оновлення нарядів");
     }
   };
 
