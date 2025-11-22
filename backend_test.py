@@ -135,14 +135,28 @@ class MilitaryAppTester:
         )
         return success and response.get('role') == 'admin'
 
-    def test_get_news(self):
-        """Test get news endpoint (public)"""
+    def test_get_settings(self):
+        """Test get settings endpoint (public) - Review Request Test"""
         success, response = self.run_test(
-            "Get News (Public)",
+            "Get Settings (Review Request)",
+            "GET",
+            "settings",
+            200
+        )
+        if success:
+            print(f"   ✅ Settings data received: {response.get('unit_name', 'No unit_name')}")
+        return success
+
+    def test_get_news(self):
+        """Test get news endpoint (public) - Review Request Test"""
+        success, response = self.run_test(
+            "Get News (Review Request)",
             "GET",
             "news",
             200
         )
+        if success:
+            print(f"   ✅ News data received: {len(response)} news items")
         return success
 
     def test_create_news(self):
