@@ -145,7 +145,6 @@ metadata:
 test_plan:
   current_focus:
     - "Mass duty creation form - date/time handling"
-    - "Bulk duty creation endpoint"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
