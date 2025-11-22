@@ -107,15 +107,18 @@ user_problem_statement: "Переробити вкладку створення 
 backend:
   - task: "New duty model and endpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Спрощена модель DutyRoster (тільки user_id, user_name, duty_date). Оновлені endpoints: POST /api/duties/bulk (приймає масив {user_id, dates}), GET /api/duties/user/{user_id}, PUT /api/duties/user/{user_id} (з body {dates}), DELETE /api/duties/user/{user_id}. Видалено поля: duty_type, position, shift_start, shift_end, rotation_cycle, notes."
+      - working: true
+        agent: "testing"
+        comment: "✅ ВСІХ НОВІ ENDPOINTS ПРОТЕСТОВАНІ ТА ПРАЦЮЮТЬ ПРАВИЛЬНО: 1) POST /api/auth/login (admin: sheremet.b.s@gmail.com/8662196415q) ✅, 2) GET /api/groups ✅ (знайдено 4 групи), 3) GET /api/groups/{group_id}/members ✅ (знайдено 4 користувачі в групі), 4) POST /api/duties/bulk ✅ (створено 5 нарядів з новим форматом {duties: [{user_id, dates}]}), 5) GET /api/duties/user/{user_id} ✅ (повертає список з duty_date), 6) PUT /api/duties/user/{user_id} ✅ (оновлює наряди користувача), 7) DELETE /api/duties/user/{user_id} ✅ (видаляє всі наряди користувача), 8) GET /api/duties ✅ (повертає структуру: id, user_id, user_name, duty_date). Нова модель підтверджена - всі обов'язкові поля присутні, старі поля відсутні."
 
 frontend:
   - task: "New duty creation interface"
