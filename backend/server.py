@@ -85,32 +85,15 @@ class DutyRoster(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
     user_name: str
-    duty_type: str  # "guard", "patrol", "kitchen", etc.
-    position: str
-    shift_start: datetime
-    shift_end: datetime
-    rotation_cycle: str  # "daily", "weekly", "monthly"
-    notes: Optional[str] = None
+    duty_date: str  # Date in ISO format (YYYY-MM-DD)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class DutyRosterCreate(BaseModel):
     user_id: str
-    duty_type: str
-    position: str
-    shift_start: str  # ISO format
-    shift_end: str  # ISO format
-    rotation_cycle: str
-    notes: Optional[str] = None
+    duty_date: str  # Date in ISO format (YYYY-MM-DD)
 
 class DutyRosterBulkCreate(BaseModel):
-    user_id: str
-    duty_type: str
-    position: str
-    dates: List[str]  # List of dates in ISO format (YYYY-MM-DD)
-    shift_start_time: str  # Time only (HH:MM)
-    shift_end_time: str  # Time only (HH:MM)
-    rotation_cycle: str
-    notes: Optional[str] = None
+    duties: List[dict]  # [{ user_id: str, dates: [str] }]
 
 class Settings(BaseModel):
     model_config = ConfigDict(extra="ignore")
