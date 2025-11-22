@@ -1,0 +1,19 @@
+{
+  "appId": "com.troop.manager",
+  "appName": "222 ЦАПБ",
+  "webDir": "build",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true,
+    "allowNavigation": [
+      "https://troop-manager-3.preview.emergentagent.com"
+    ]
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#1a2419",
+      "showSpinner": false
+    }
+  }
+}
