@@ -41,8 +41,13 @@ jobs:
         CI: false
         GENERATE_SOURCEMAP: false
         
+    - name: Copy build to root for Capacitor
+      run: |
+        mkdir -p build
+        cp -r frontend/build/* build/
+        
     - name: Sync Capacitor
-      run: npx cap sync android
+      run: cap sync android
         
     - name: Make gradlew executable
       run: chmod +x android/gradlew
