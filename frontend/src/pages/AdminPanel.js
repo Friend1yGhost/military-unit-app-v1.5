@@ -264,7 +264,7 @@ const AdminPanel = () => {
     const token = localStorage.getItem("token");
     const dates = dutyAssignments[editingUserDuties] || [];
 
-    try:
+    try {
       await axios.put(`${API}/duties/user/${editingUserDuties}`, {
         dates
       }, {
