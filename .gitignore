@@ -5,8 +5,9 @@ backend/__pycache__/
 
 # Build outputs
 frontend/build/
-frontend/android/app/build/
-frontend/android/.gradle/
+frontend/android/
+android/app/build/
+android/.gradle/
 
 # IDE
 .vscode/
