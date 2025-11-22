@@ -27,12 +27,13 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
         
-    - name: Install Capacitor CLI globally
-      run: npm install -g @capacitor/cli
+    - name: Install root dependencies (Capacitor)
+      run: |
+        yarn install
         
     - name: Install frontend dependencies
       working-directory: ./frontend
-      run: yarn install --frozen-lockfile
+      run: yarn install
         
     - name: Build React application
       working-directory: ./frontend
