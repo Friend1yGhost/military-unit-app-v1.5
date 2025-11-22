@@ -51,17 +51,12 @@ const AdminPanel = () => {
   const [rankCategory, setRankCategory] = useState("");
   const [groupForm, setGroupForm] = useState({ name: "", description: "", member_ids: [] });
   const [userForm, setUserForm] = useState({ full_name: "", email: "", password: "", rank: "", role: "user" });
-  const [dutyForm, setDutyForm] = useState({
-    user_id: "",
-    duty_type: "",
-    position: "",
-    shift_start: "",
-    shift_end: "",
-    rotation_cycle: "weekly",
-    notes: ""
-  });
-  const [selectedDates, setSelectedDates] = useState([]);
-  const [bulkMode, setBulkMode] = useState(true);
+  
+  // Duty states
+  const [selectedGroupForDuties, setSelectedGroupForDuties] = useState("");
+  const [groupMembers, setGroupMembers] = useState([]);
+  const [dutyAssignments, setDutyAssignments] = useState({}); // { user_id: [dates] }
+  const [editingUserDuties, setEditingUserDuties] = useState(null); // user_id for editing
 
   useEffect(() => {
     fetchData();
