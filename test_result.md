@@ -120,6 +120,21 @@ backend:
         agent: "testing"
         comment: "✅ ВСІХ НОВІ ENDPOINTS ПРОТЕСТОВАНІ ТА ПРАЦЮЮТЬ ПРАВИЛЬНО: 1) POST /api/auth/login (admin: sheremet.b.s@gmail.com/8662196415q) ✅, 2) GET /api/groups ✅ (знайдено 4 групи), 3) GET /api/groups/{group_id}/members ✅ (знайдено 4 користувачі в групі), 4) POST /api/duties/bulk ✅ (створено 5 нарядів з новим форматом {duties: [{user_id, dates}]}), 5) GET /api/duties/user/{user_id} ✅ (повертає список з duty_date), 6) PUT /api/duties/user/{user_id} ✅ (оновлює наряди користувача), 7) DELETE /api/duties/user/{user_id} ✅ (видаляє всі наряди користувача), 8) GET /api/duties ✅ (повертає структуру: id, user_id, user_name, duty_date). Нова модель підтверджена - всі обов'язкові поля присутні, старі поля відсутні."
 
+  - task: "Backend URL migration to new server"
+    implemented: true
+    working: true
+    file: "/app/frontend/.env"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Замінено backend URL з https://troop-manager-3.preview.emergentagent.com на https://two22-tsapb.onrender.com в frontend/.env файлі"
+      - working: true
+        agent: "testing"
+        comment: "✅ НОВИЙ BACKEND URL ПРОТЕСТОВАНО УСПІШНО! Всі основні endpoints доступні на https://two22-tsapb.onrender.com: 1) GET /api/settings ✅ (повертає дані налаштувань), 2) POST /api/auth/login ✅ (авторизація з sheremet.b.s@gmail.com/8662196415q працює, токен отримано), 3) GET /api/news ✅ (повертає список новин), 4) GET /api/users ✅ (з токеном повертає список користувачів), 5) GET /api/auth/me ✅ (повертає дані поточного користувача), 6) GET /api/groups ✅ (повертає групи). CORS: запити проходять успішно, хоча CORS заголовки не видимі (можливо обробляються проксі/ingress). Frontend правильно налаштований на новий backend URL."
+
 frontend:
   - task: "New duty creation interface"
     implemented: true
