@@ -35,6 +35,8 @@ class MilitaryAppTester:
                 response = requests.get(url, headers=test_headers)
             elif method == 'POST':
                 response = requests.post(url, json=data, headers=test_headers)
+            elif method == 'PUT':
+                response = requests.put(url, json=data, headers=test_headers)
             elif method == 'DELETE':
                 response = requests.delete(url, headers=test_headers)
 
