@@ -1,0 +1,7 @@
+{
+  "name": "military-unit-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
