@@ -331,136 +331,113 @@ async def delete_news(news_id: str, current_user: User = Depends(get_admin_user)
 # Duty Roster Routes
 @api_router.get("/duties", response_model=List[DutyRoster])
 async def get_all_duties(current_user: User = Depends(get_current_user)):
-    duties = await db.duties.find({}, {"_id": 0}).sort("shift_start", 1).to_list(1000)
+    """Get all duties"""
+    duties = await db.duties.find({}, {"_id": 0}).sort("duty_date", 1).to_list(10000)
     
     for duty in duties:
         if isinstance(duty['created_at'], str):
             duty['created_at'] = datetime.fromisoformat(duty['created_at'])
-        if isinstance(duty['shift_start'], str):
-            duty['shift_start'] = datetime.fromisoformat(duty['shift_start'])
-        if isinstance(duty['shift_end'], str):
-            duty['shift_end'] = datetime.fromisoformat(duty['shift_end'])
     
     return duties
 
 @api_router.get("/duties/my", response_model=List[DutyRoster])
 async def get_my_duties(current_user: User = Depends(get_current_user)):
-    duties = await db.duties.find({"user_id": current_user.id}, {"_id": 0}).sort("shift_start", 1).to_list(1000)
+    """Get current user's duties"""
+    duties = await db.duties.find({"user_id": current_user.id}, {"_id": 0}).sort("duty_date", 1).to_list(10000)
     
     for duty in duties:
         if isinstance(duty['created_at'], str):
             duty['created_at'] = datetime.fromisoformat(duty['created_at'])
-        if isinstance(duty['shift_start'], str):
-            duty['shift_start'] = datetime.fromisoformat(duty['shift_start'])
-        if isinstance(duty['shift_end'], str):
-            duty['shift_end'] = datetime.fromisoformat(duty['shift_end'])
     
     return duties
 
-@api_router.post("/duties", response_model=DutyRoster)
-async def create_duty(duty_data: DutyRosterCreate, current_user: User = Depends(get_admin_user)):
-    # Get user info
-    user_doc = await db.users.find_one({"id": duty_data.user_id}, {"_id": 0})
-    if not user_doc:
-        raise HTTPException(status_code=404, detail="User not found")
+@api_router.get("/duties/user/{user_id}", response_model=List[DutyRoster])
+async def get_user_duties(user_id: str, current_user: User = Depends(get_current_user)):
+    """Get specific user's duties"""
+    duties = await db.duties.find({"user_id": user_id}, {"_id": 0}).sort("duty_date", 1).to_list(10000)
     
-    duty = DutyRoster(
-        user_id=duty_data.user_id,
-        user_name=user_doc['full_name'],
-        duty_type=duty_data.duty_type,
-        position=duty_data.position,
-        shift_start=datetime.fromisoformat(duty_data.shift_start),
-        shift_end=datetime.fromisoformat(duty_data.shift_end),
-        rotation_cycle=duty_data.rotation_cycle,
-        notes=duty_data.notes
-    )
+    for duty in duties:
+        if isinstance(duty['created_at'], str):
+            duty['created_at'] = datetime.fromisoformat(duty['created_at'])
     
-    duty_doc = duty.model_dump()
-    duty_doc['created_at'] = duty_doc['created_at'].isoformat()
-    duty_doc['shift_start'] = duty_doc['shift_start'].isoformat()
-    duty_doc['shift_end'] = duty_doc['shift_end'].isoformat()
-    
-    await db.duties.insert_one(duty_doc)
-    return duty
+    return duties
 
 @api_router.post("/duties/bulk")
 async def create_duties_bulk(duty_data: DutyRosterBulkCreate, current_user: User = Depends(get_admin_user)):
-    """Create multiple duties at once for selected dates"""
+    """Create multiple duties for multiple users at once"""
+    created_count = 0
+    
+    for user_duty in duty_data.duties:
+        user_id = user_duty.get("user_id")
+        dates = user_duty.get("dates", [])
+        
+        # Get user info
+        user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user_doc:
+            continue  # Skip if user not found
+        
+        for date_str in dates:
+            # Check if duty already exists for this user and date
+            existing = await db.duties.find_one({"user_id": user_id, "duty_date": date_str})
+            if existing:
+                continue  # Skip if already exists
+            
+            duty = DutyRoster(
+                user_id=user_id,
+                user_name=user_doc['full_name'],
+                duty_date=date_str
+            )
+            
+            duty_doc = duty.model_dump()
+            duty_doc['created_at'] = duty_doc['created_at'].isoformat()
+            
+            await db.duties.insert_one(duty_doc)
+            created_count += 1
+    
+    return {
+        "message": f"Створено {created_count} нарядів",
+        "count": created_count
+    }
+
+@api_router.put("/duties/user/{user_id}")
+async def update_user_duties(user_id: str, dates: List[str], current_user: User = Depends(get_admin_user)):
+    """Update duties for a specific user - replace all duties with new dates"""
     # Get user info
-    user_doc = await db.users.find_one({"id": duty_data.user_id}, {"_id": 0})
+    user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
     if not user_doc:
         raise HTTPException(status_code=404, detail="User not found")
     
-    created_duties = []
-    for date_str in duty_data.dates:
-        # Combine date with time
-        shift_start = datetime.fromisoformat(f"{date_str}T{duty_data.shift_start_time}:00")
-        shift_end = datetime.fromisoformat(f"{date_str}T{duty_data.shift_end_time}:00")
-        
+    # Delete all existing duties for this user
+    await db.duties.delete_many({"user_id": user_id})
+    
+    # Create new duties
+    created_count = 0
+    for date_str in dates:
         duty = DutyRoster(
-            user_id=duty_data.user_id,
+            user_id=user_id,
             user_name=user_doc['full_name'],
-            duty_type=duty_data.duty_type,
-            position=duty_data.position,
-            shift_start=shift_start,
-            shift_end=shift_end,
-            rotation_cycle=duty_data.rotation_cycle,
-            notes=duty_data.notes
+            duty_date=date_str
         )
         
         duty_doc = duty.model_dump()
         duty_doc['created_at'] = duty_doc['created_at'].isoformat()
-        duty_doc['shift_start'] = duty_doc['shift_start'].isoformat()
-        duty_doc['shift_end'] = duty_doc['shift_end'].isoformat()
         
         await db.duties.insert_one(duty_doc)
-        created_duties.append(duty)
+        created_count += 1
     
     return {
-        "message": f"Створено {len(created_duties)} нарядів",
-        "count": len(created_duties)
+        "message": f"Оновлено наряди для {user_doc['full_name']}",
+        "count": created_count
     }
 
-@api_router.put("/duties/{duty_id}", response_model=DutyRoster)
-async def update_duty(duty_id: str, duty_data: DutyRosterCreate, current_user: User = Depends(get_admin_user)):
-    existing_duty = await db.duties.find_one({"id": duty_id}, {"_id": 0})
-    if not existing_duty:
-        raise HTTPException(status_code=404, detail="Duty not found")
-    
-    # Get user info
-    user_doc = await db.users.find_one({"id": duty_data.user_id}, {"_id": 0})
-    if not user_doc:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    update_data = {
-        "user_id": duty_data.user_id,
-        "user_name": user_doc['full_name'],
-        "duty_type": duty_data.duty_type,
-        "position": duty_data.position,
-        "shift_start": datetime.fromisoformat(duty_data.shift_start).isoformat(),
-        "shift_end": datetime.fromisoformat(duty_data.shift_end).isoformat(),
-        "rotation_cycle": duty_data.rotation_cycle,
-        "notes": duty_data.notes
+@api_router.delete("/duties/user/{user_id}")
+async def delete_user_duties(user_id: str, current_user: User = Depends(get_admin_user)):
+    """Delete all duties for a specific user"""
+    result = await db.duties.delete_many({"user_id": user_id})
+    return {
+        "message": f"Видалено {result.deleted_count} нарядів",
+        "count": result.deleted_count
     }
-    
-    await db.duties.update_one({"id": duty_id}, {"$set": update_data})
-    
-    updated_duty = await db.duties.find_one({"id": duty_id}, {"_id": 0})
-    if isinstance(updated_duty['created_at'], str):
-        updated_duty['created_at'] = datetime.fromisoformat(updated_duty['created_at'])
-    if isinstance(updated_duty['shift_start'], str):
-        updated_duty['shift_start'] = datetime.fromisoformat(updated_duty['shift_start'])
-    if isinstance(updated_duty['shift_end'], str):
-        updated_duty['shift_end'] = datetime.fromisoformat(updated_duty['shift_end'])
-    
-    return DutyRoster(**updated_duty)
-
-@api_router.delete("/duties/{duty_id}")
-async def delete_duty(duty_id: str, current_user: User = Depends(get_admin_user)):
-    result = await db.duties.delete_one({"id": duty_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Duty not found")
-    return {"message": "Duty deleted successfully"}
 
 @api_router.get("/users", response_model=List[User])
 async def get_users(current_user: User = Depends(get_admin_user)):
