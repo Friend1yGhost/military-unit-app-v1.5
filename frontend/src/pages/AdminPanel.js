@@ -580,234 +580,215 @@ const AdminPanel = () => {
 
           {/* Duties Tab */}
           <TabsContent value="duties" className="space-y-8">
-            <Card className="bg-military-green border-2 border-military-olive">
-              <CardHeader className="border-b border-military-olive">
-                <div className="flex items-center justify-between">
+            {!editingUserDuties ? (
+              <Card className="bg-military-green border-2 border-military-olive">
+                <CardHeader className="border-b border-military-olive">
                   <CardTitle className="text-military-gold flex items-center">
-                    {editingDuty ? (
-                      <>
-                        <Edit className="w-6 h-6 mr-2" />
-                        Редактировать Наряд
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-6 h-6 mr-2" />
-                        Создать Наряд
-                      </>
-                    )}
+                    <Calendar className="w-6 h-6 mr-2" />
+                    Створити Наряди для Групи
                   </CardTitle>
-                  {editingDuty && (
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="space-y-6">
+                    {/* Group Selection */}
+                    <div className="space-y-2">
+                      <Label htmlFor="duty-group" className="text-military-light font-semibold text-lg">
+                        Оберіть групу
+                      </Label>
+                      <Select value={selectedGroupForDuties} onValueChange={handleGroupSelectForDuties}>
+                        <SelectTrigger className="bg-military-dark border-military-olive text-military-light">
+                          <SelectValue placeholder="Виберіть групу..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-military-dark border-military-olive">
+                          {groups.map((group) => (
+                            <SelectItem key={group.id} value={group.id} className="text-military-light">
+                              {group.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Duty Assignment Table */}
+                    {selectedGroupForDuties && groupMembers.length > 0 && (
+                      <form onSubmit={handleDutySubmit} className="space-y-4">
+                        <div className="overflow-x-auto">
+                          <table className="w-full border-collapse">
+                            <thead>
+                              <tr className="bg-military-dark">
+                                <th className="border border-military-olive p-2 text-military-gold text-left sticky left-0 bg-military-dark z-10">
+                                  ПІБ
+                                </th>
+                                {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                                  <th key={day} className="border border-military-olive p-2 text-military-gold text-center min-w-[40px]">
+                                    {day}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {groupMembers.map((member) => {
+                                const currentDate = new Date();
+                                const year = currentDate.getFullYear();
+                                const month = currentDate.getMonth() + 1;
+                                
+                                return (
+                                  <tr key={member.id} className="hover:bg-military-dark/50">
+                                    <td className="border border-military-olive p-2 text-military-light font-semibold sticky left-0 bg-military-green z-10">
+                                      {member.full_name}
+                                    </td>
+                                    {Array.from({ length: 31 }, (_, i) => {
+                                      const day = i + 1;
+                                      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                                      const isChecked = (dutyAssignments[member.id] || []).includes(dateStr);
+                                      
+                                      return (
+                                        <td key={day} className="border border-military-olive p-1 text-center">
+                                          <input
+                                            type="checkbox"
+                                            checked={isChecked}
+                                            onChange={() => toggleDuty(member.id, dateStr)}
+                                            className="w-5 h-5 cursor-pointer accent-military-gold"
+                                          />
+                                        </td>
+                                      );
+                                    })}
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <Button 
+                          type="submit" 
+                          className="bg-military-olive hover:bg-military-accent text-military-dark font-bold w-full"
+                        >
+                          Створити Наряди
+                        </Button>
+                      </form>
+                    )}
+
+                    {selectedGroupForDuties && groupMembers.length === 0 && (
+                      <p className="text-military-accent text-center py-8">
+                        В цій групі немає користувачів
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="bg-military-green border-2 border-military-olive">
+                <CardHeader className="border-b border-military-olive">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-military-gold flex items-center">
+                      <Edit className="w-6 h-6 mr-2" />
+                      Редагувати Наряди Користувача
+                    </CardTitle>
                     <Button
                       type="button"
                       onClick={() => {
-                        setEditingDuty(null);
-                        setDutyForm({ user_id: "", duty_type: "", position: "", shift_start: "", shift_end: "", rotation_cycle: "weekly", notes: "" });
+                        setEditingUserDuties(null);
+                        setDutyAssignments({});
                       }}
                       variant="ghost"
                       className="text-military-light hover:text-military-accent"
                     >
                       <X className="w-5 h-5 mr-1" />
-                      Отменить
+                      Скасувати
                     </Button>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <form onSubmit={handleDutySubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="user" className="text-military-light">Пользователь</Label>
-                    <Select value={dutyForm.user_id} onValueChange={(value) => setDutyForm({ ...dutyForm, user_id: value })}>
-                      <SelectTrigger className="bg-military-dark border-military-olive text-military-light" data-testid="duty-user-select">
-                        <SelectValue placeholder="Выберите пользователя" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-military-dark border-military-olive">
-                        {users.map((user) => (
-                          <SelectItem key={user.id} value={user.id} className="text-military-light">
-                            {user.full_name} ({user.email})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="duty_type" className="text-military-light">Тип Наряда</Label>
-                      <Input
-                        id="duty_type"
-                        value={dutyForm.duty_type}
-                        onChange={(e) => setDutyForm({ ...dutyForm, duty_type: e.target.value })}
-                        placeholder="Караул, Патруль, Кухня..."
-                        className="bg-military-dark border-military-olive text-military-light"
-                        required
-                        data-testid="duty-type-input"
-                      />
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="bg-military-dark">
+                            <th className="border border-military-olive p-2 text-military-gold text-left">
+                              День місяця
+                            </th>
+                            <th className="border border-military-olive p-2 text-military-gold text-center">
+                              Наряд
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {Array.from({ length: 31 }, (_, i) => {
+                            const day = i + 1;
+                            const currentDate = new Date();
+                            const year = currentDate.getFullYear();
+                            const month = currentDate.getMonth() + 1;
+                            const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                            const isChecked = (dutyAssignments[editingUserDuties] || []).includes(dateStr);
+                            
+                            return (
+                              <tr key={day} className="hover:bg-military-dark/50">
+                                <td className="border border-military-olive p-3 text-military-light font-semibold">
+                                  {day}
+                                </td>
+                                <td className="border border-military-olive p-3 text-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => toggleDuty(editingUserDuties, dateStr)}
+                                    className="w-6 h-6 cursor-pointer accent-military-gold"
+                                  />
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="position" className="text-military-light">Позиция</Label>
-                      <Input
-                        id="position"
-                        value={dutyForm.position}
-                        onChange={(e) => setDutyForm({ ...dutyForm, position: e.target.value })}
-                        placeholder="Пост №1, Кухня..."
-                        className="bg-military-dark border-military-olive text-military-light"
-                        required
-                        data-testid="duty-position-input"
-                      />
-                    </div>
+                    <Button 
+                      onClick={handleSaveUserDuties}
+                      className="bg-military-olive hover:bg-military-accent text-military-dark font-bold w-full"
+                    >
+                      Зберегти Зміни
+                    </Button>
                   </div>
+                </CardContent>
+              </Card>
+            )}
 
-                  {!editingDuty && (
-                    <div className="p-4 bg-military-dark rounded-lg border border-military-olive space-y-3">
-                      <Label className="text-military-light font-semibold">Виберіть дати нарядів</Label>
-                      <div className="grid grid-cols-7 gap-2">
-                        {Array.from({ length: 31 }, (_, i) => {
-                          const day = i + 1;
-                          const date = new Date();
-                          date.setDate(day);
-                          const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                          const isSelected = selectedDates.includes(dateStr);
-                          
-                          return (
-                            <button
-                              key={day}
-                              type="button"
-                              onClick={() => {
-                                if (isSelected) {
-                                  setSelectedDates(selectedDates.filter(d => d !== dateStr));
-                                } else {
-                                  setSelectedDates([...selectedDates, dateStr]);
-                                }
-                              }}
-                              className={`p-2 rounded text-sm font-semibold transition-colors ${
-                                isSelected
-                                  ? 'bg-military-gold text-military-dark'
-                                  : 'bg-military-green text-military-light hover:bg-military-olive'
-                              }`}
-                            >
-                              {day}
-                            </button>
-                          );
-                        })}
-                      </div>
-                      <p className="text-military-accent text-sm">
-                        Обрано днів: {selectedDates.length}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="shift_start" className="text-military-light">
-                        {editingDuty ? "Початок Зміни" : "Час Початку"}
-                      </Label>
-                      <Input
-                        id="shift_start"
-                        type={editingDuty ? "datetime-local" : "time"}
-                        value={dutyForm.shift_start}
-                        onChange={(e) => setDutyForm({ ...dutyForm, shift_start: e.target.value })}
-                        className="bg-military-dark border-military-olive text-military-light"
-                        required
-                        data-testid="duty-start-input"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="shift_end" className="text-military-light">
-                        {editingDuty ? "Кінець Зміни" : "Час Закінчення"}
-                      </Label>
-                      <Input
-                        id="shift_end"
-                        type={editingDuty ? "datetime-local" : "time"}
-                        value={dutyForm.shift_end}
-                        onChange={(e) => setDutyForm({ ...dutyForm, shift_end: e.target.value })}
-                        className="bg-military-dark border-military-olive text-military-light"
-                        required
-                        data-testid="duty-end-input"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="rotation" className="text-military-light">Цикл Ротации</Label>
-                    <Select value={dutyForm.rotation_cycle} onValueChange={(value) => setDutyForm({ ...dutyForm, rotation_cycle: value })}>
-                      <SelectTrigger className="bg-military-dark border-military-olive text-military-light" data-testid="duty-rotation-select">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-military-dark border-military-olive">
-                        <SelectItem value="daily" className="text-military-light">Ежедневно</SelectItem>
-                        <SelectItem value="weekly" className="text-military-light">Еженедельно</SelectItem>
-                        <SelectItem value="monthly" className="text-military-light">Ежемесячно</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="notes" className="text-military-light">Примечания</Label>
-                    <Textarea
-                      id="notes"
-                      value={dutyForm.notes}
-                      onChange={(e) => setDutyForm({ ...dutyForm, notes: e.target.value })}
-                      className="bg-military-dark border-military-olive text-military-light"
-                      data-testid="duty-notes-input"
-                    />
-                  </div>
-
-                  <Button type="submit" className="bg-military-olive hover:bg-military-accent text-military-dark font-bold" data-testid="create-duty-btn">
-                    Создать Наряд
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-
+            {/* List of all users with edit button */}
             <Card className="bg-military-green border-2 border-military-olive">
               <CardHeader className="border-b border-military-olive">
-                <CardTitle className="text-military-gold">Все Наряды</CardTitle>
+                <CardTitle className="text-military-gold">Користувачі</CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
-                <div className="space-y-4">
-                  {duties.map((duty) => (
-                    <div
-                      key={duty.id}
-                      className="flex items-start justify-between p-4 bg-military-dark rounded-lg border border-military-olive"
-                      data-testid={`admin-duty-item-${duty.id}`}
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <User className="w-4 h-4 text-military-gold" />
-                          <h3 className="text-military-gold font-bold">{duty.user_name}</h3>
+                <div className="space-y-3">
+                  {users.map((user) => {
+                    const userDutyCount = duties.filter(d => d.user_id === user.id).length;
+                    
+                    return (
+                      <div
+                        key={user.id}
+                        className="flex items-center justify-between p-4 bg-military-dark rounded-lg border border-military-olive"
+                      >
+                        <div className="flex items-center space-x-3">
+                          <User className="w-5 h-5 text-military-gold" />
+                          <div>
+                            <h3 className="text-military-light font-bold">{user.full_name}</h3>
+                            <p className="text-military-accent text-sm">
+                              Нарядів: {userDutyCount}
+                            </p>
+                          </div>
                         </div>
-                        <p className="text-military-light text-sm mb-1">
-                          <span className="font-semibold">Тип:</span> {duty.duty_type} | <span className="font-semibold">Позиция:</span> {duty.position}
-                        </p>
-                        <p className="text-military-accent text-xs">
-                          <Calendar className="w-3 h-3 inline mr-1" />
-                          {new Date(duty.shift_start).toLocaleString("ru")} - {new Date(duty.shift_end).toLocaleString("ru")}
-                        </p>
-                        {duty.notes && <p className="text-military-light text-xs mt-2 italic">{duty.notes}</p>}
-                      </div>
-                      <div className="flex gap-2 ml-4">
                         <Button
-                          onClick={() => handleEditDuty(duty)}
+                          onClick={() => handleEditUserDuties(user.id)}
                           variant="outline"
                           size="sm"
                           className="border-military-olive text-military-light hover:bg-military-olive hover:text-military-gold"
-                          data-testid={`edit-duty-btn-${duty.id}`}
                         >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          onClick={() => handleDeleteDuty(duty.id)}
-                          variant="destructive"
-                          size="sm"
-                          data-testid={`delete-duty-btn-${duty.id}`}
-                        >
-                          <Trash2 className="w-4 h-4" />
+                          <Edit className="w-4 h-4 mr-2" />
+                          Редагувати Наряди
                         </Button>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
