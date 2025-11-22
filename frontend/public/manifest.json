@@ -1,0 +1,24 @@
+{
+  "short_name": "222 ЦАПБ",
+  "name": "Система Управління Військовим Підрозділом",
+  "description": "Додаток для управління нарядами, новинами та користувачами військового підрозділу",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#2d3a2e",
+  "background_color": "#1a2419",
+  "orientation": "portrait-primary"
+}
