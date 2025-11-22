@@ -211,7 +211,47 @@ class MilitaryAppTester:
             200,
             headers={"Authorization": f"Bearer {self.admin_token}"}
         )
+        if success:
+            print(f"   ✅ Users data received: {len(response)} users")
         return success and isinstance(response, list)
+
+    def test_cors_headers(self):
+        """Test CORS headers - Review Request Test"""
+        url = f"{self.api_url}/settings"
+        
+        try:
+            # Make an OPTIONS request to check CORS
+            response = requests.options(url)
+            
+            cors_headers = {
+                'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers'),
+                'Access-Control-Allow-Credentials': response.headers.get('Access-Control-Allow-Credentials')
+            }
+            
+            print(f"🔍 Testing CORS Headers...")
+            print(f"   Status Code: {response.status_code}")
+            for header, value in cors_headers.items():
+                if value:
+                    print(f"   ✅ {header}: {value}")
+                else:
+                    print(f"   ❌ {header}: Not present")
+            
+            # Check if basic CORS headers are present
+            has_origin = cors_headers['Access-Control-Allow-Origin'] is not None
+            has_methods = cors_headers['Access-Control-Allow-Methods'] is not None
+            
+            if has_origin and has_methods:
+                print("   ✅ CORS headers present")
+                return True
+            else:
+                print("   ❌ Missing essential CORS headers")
+                return False
+                
+        except Exception as e:
+            print(f"❌ CORS test failed with error: {str(e)}")
+            return False
 
     def test_get_duties(self):
         """Test get all duties endpoint"""
