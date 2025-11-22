@@ -1,0 +1,14 @@
+{
+  "name": "military-unit-app",
+  "version": "1.0.0",
+  "description": "222 ЦАПБ - Military Unit Management App",
+  "scripts": {
+    "build": "cd frontend && yarn install && yarn build",
+    "postbuild": "npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4"
+  }
+}
