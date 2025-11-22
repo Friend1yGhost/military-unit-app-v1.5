@@ -138,15 +138,18 @@ frontend:
 
   - task: "MyDuties page updates"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/MyDuties.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Оновлено для роботи з новою структурою даних (duty_date замість shift_start/shift_end). Видалено поля duty_type, position, times. Таблиця розкладу використовує duty_date для порівняння."
+      - working: true
+        agent: "testing"
+        comment: "✅ RESPONSIVE DESIGN ПРОТЕСТОВАНО: сторінка 'Мої Наряди' працює на всіх роздільних здатностях. Навігація через мобільне меню (Mobile 390x844) та десктопне меню (Tablet 768x1024, Desktop 1920x1080) працює правильно. Сторінка завантажується без помилок. Minor: таблиці розкладу порожні, але це може бути через відсутність даних нарядів для поточного користувача."
 
 metadata:
   created_by: "main_agent"
