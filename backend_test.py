@@ -284,54 +284,100 @@ class MilitaryAppTester:
         )
         return success
 
-    def test_bulk_duty_creation(self):
-        """Test bulk duty creation endpoint - main focus of this test"""
+    def test_get_groups(self):
+        """Test get groups endpoint"""
         if not self.admin_token:
-            print("❌ No admin token available for bulk duty creation")
+            print("❌ No admin token available for groups endpoint")
             return False
             
-        # First get users to find a user_id
-        success, users_response = self.run_test(
-            "Get Users for Bulk Duty",
+        success, response = self.run_test(
+            "Get Groups",
             "GET",
-            "users",
+            "groups",
             200,
             headers={"Authorization": f"Bearer {self.admin_token}"}
         )
         
-        if not success or not users_response or len(users_response) == 0:
-            print("❌ No users available for bulk duty creation")
+        if success:
+            print(f"   ✅ Found {len(response)} groups")
+            # Store first group for member testing
+            if response and len(response) > 0:
+                self.test_group_id = response[0]['id']
+                print(f"   ✅ Using group: {response[0]['name']} (ID: {self.test_group_id})")
+            return True
+        return False
+
+    def test_get_group_members(self):
+        """Test get group members endpoint"""
+        if not self.admin_token:
+            print("❌ No admin token available for group members endpoint")
             return False
             
-        # Use the first non-admin user, or create test user if needed
-        target_user = None
-        for user in users_response:
-            if user.get('role') != 'admin':
-                target_user = user
-                break
-        
-        if not target_user:
-            # Use admin user if no regular users exist
-            target_user = users_response[0]
+        if not hasattr(self, 'test_group_id') or not self.test_group_id:
+            print("❌ No group ID available for members test")
+            return False
             
-        user_id = target_user['id']
-        print(f"   Using user: {target_user['full_name']} (ID: {user_id})")
-        
-        # Test bulk duty creation with the specific format from the review request
         success, response = self.run_test(
-            "Bulk Duty Creation",
+            "Get Group Members",
+            "GET",
+            f"groups/{self.test_group_id}/members",
+            200,
+            headers={"Authorization": f"Bearer {self.admin_token}"}
+        )
+        
+        if success:
+            print(f"   ✅ Found {len(response)} members in group")
+            # Store users for duty testing
+            if response and len(response) > 0:
+                self.group_users = response
+                print(f"   ✅ Available users: {[u['full_name'] for u in response[:3]]}")
+            return True
+        return False
+
+    def test_new_bulk_duty_creation(self):
+        """Test NEW bulk duty creation endpoint with simplified model"""
+        if not self.admin_token:
+            print("❌ No admin token available for bulk duty creation")
+            return False
+            
+        # Get users if we don't have them from groups
+        if not hasattr(self, 'group_users') or not self.group_users:
+            success, users_response = self.run_test(
+                "Get Users for Bulk Duty",
+                "GET",
+                "users",
+                200,
+                headers={"Authorization": f"Bearer {self.admin_token}"}
+            )
+            
+            if not success or not users_response or len(users_response) == 0:
+                print("❌ No users available for bulk duty creation")
+                return False
+            self.group_users = users_response
+            
+        # Use first two users for testing
+        user1 = self.group_users[0]
+        user2 = self.group_users[1] if len(self.group_users) > 1 else self.group_users[0]
+        
+        print(f"   Using users: {user1['full_name']} and {user2['full_name']}")
+        
+        # Test NEW bulk duty creation format
+        success, response = self.run_test(
+            "NEW Bulk Duty Creation",
             "POST",
             "duties/bulk",
             200,
             data={
-                "user_id": user_id,
-                "duty_type": "Караул",
-                "position": "Пост №1",
-                "dates": ["2025-01-15", "2025-01-16", "2025-01-17"],
-                "shift_start_time": "08:00",
-                "shift_end_time": "20:00",
-                "rotation_cycle": "daily",
-                "notes": "Тестовий наряд"
+                "duties": [
+                    {
+                        "user_id": user1['id'],
+                        "dates": ["2025-11-22", "2025-11-23", "2025-11-24"]
+                    },
+                    {
+                        "user_id": user2['id'],
+                        "dates": ["2025-11-22", "2025-11-25"]
+                    }
+                ]
             },
             headers={"Authorization": f"Bearer {self.admin_token}"}
         )
@@ -340,43 +386,154 @@ class MilitaryAppTester:
             print(f"   ✅ Bulk creation successful: {response.get('message', 'No message')}")
             print(f"   ✅ Created duties count: {response.get('count', 'Unknown')}")
             
-            # Verify the duties were actually created by checking the duties list
+            # Store user IDs for further testing
+            self.test_user_1_id = user1['id']
+            self.test_user_2_id = user2['id']
+            
+            return True
+        return False
+
+    def test_get_user_duties(self):
+        """Test get user duties endpoint"""
+        if not self.admin_token or not hasattr(self, 'test_user_1_id'):
+            print("❌ No admin token or user ID available for user duties test")
+            return False
+            
+        success, response = self.run_test(
+            "Get User Duties",
+            "GET",
+            f"duties/user/{self.test_user_1_id}",
+            200,
+            headers={"Authorization": f"Bearer {self.admin_token}"}
+        )
+        
+        if success:
+            print(f"   ✅ Found {len(response)} duties for user")
+            if response:
+                sample_duty = response[0]
+                print(f"   ✅ Sample duty structure: id={sample_duty.get('id')}, user_id={sample_duty.get('user_id')}, user_name={sample_duty.get('user_name')}, duty_date={sample_duty.get('duty_date')}")
+                
+                # Verify new structure (should have duty_date, not shift_start/shift_end)
+                if 'duty_date' in sample_duty and 'shift_start' not in sample_duty:
+                    print("   ✅ New duty structure confirmed (duty_date field present)")
+                    return True
+                else:
+                    print("   ❌ Old duty structure detected")
+                    return False
+            return True
+        return False
+
+    def test_update_user_duties(self):
+        """Test update user duties endpoint"""
+        if not self.admin_token or not hasattr(self, 'test_user_1_id'):
+            print("❌ No admin token or user ID available for update duties test")
+            return False
+            
+        success, response = self.run_test(
+            "Update User Duties",
+            "PUT",
+            f"duties/user/{self.test_user_1_id}",
+            200,
+            data={
+                "dates": ["2025-11-26", "2025-11-27", "2025-11-28"]
+            },
+            headers={"Authorization": f"Bearer {self.admin_token}"}
+        )
+        
+        if success:
+            print(f"   ✅ Update successful: {response.get('message', 'No message')}")
+            print(f"   ✅ Updated duties count: {response.get('count', 'Unknown')}")
+            
+            # Verify the update by getting user duties again
             verify_success, duties_response = self.run_test(
-                "Verify Created Duties",
+                "Verify Updated Duties",
                 "GET",
-                "duties",
+                f"duties/user/{self.test_user_1_id}",
                 200,
                 headers={"Authorization": f"Bearer {self.admin_token}"}
             )
             
-            if verify_success and duties_response:
-                # Check if we can find duties for our test dates
-                created_duties = []
-                for duty in duties_response:
-                    if (duty.get('user_id') == user_id and 
-                        duty.get('duty_type') == 'Караул' and 
-                        duty.get('position') == 'Пост №1'):
-                        created_duties.append(duty)
-                        
-                print(f"   ✅ Found {len(created_duties)} matching duties in the system")
+            if verify_success:
+                duty_dates = [duty['duty_date'] for duty in duties_response]
+                expected_dates = ["2025-11-26", "2025-11-27", "2025-11-28"]
                 
-                # Check date/time format
-                if created_duties:
-                    sample_duty = created_duties[0]
-                    print(f"   ✅ Sample duty shift_start: {sample_duty.get('shift_start')}")
-                    print(f"   ✅ Sample duty shift_end: {sample_duty.get('shift_end')}")
-                    
-                    # Verify the time format is correct (should contain the times we specified)
-                    shift_start = sample_duty.get('shift_start', '')
-                    shift_end = sample_duty.get('shift_end', '')
-                    
-                    if '08:00' in shift_start and '20:00' in shift_end:
-                        print("   ✅ Date/time formatting is correct")
-                        return True
-                    else:
-                        print(f"   ❌ Date/time formatting issue - start: {shift_start}, end: {shift_end}")
-                        return False
-                        
+                if all(date in duty_dates for date in expected_dates):
+                    print("   ✅ All new dates found in user duties")
+                    return True
+                else:
+                    print(f"   ❌ Expected dates not found. Got: {duty_dates}")
+                    return False
+            return True
+        return False
+
+    def test_delete_user_duties(self):
+        """Test delete user duties endpoint"""
+        if not self.admin_token or not hasattr(self, 'test_user_2_id'):
+            print("❌ No admin token or user ID available for delete duties test")
+            return False
+            
+        success, response = self.run_test(
+            "Delete User Duties",
+            "DELETE",
+            f"duties/user/{self.test_user_2_id}",
+            200,
+            headers={"Authorization": f"Bearer {self.admin_token}"}
+        )
+        
+        if success:
+            print(f"   ✅ Delete successful: {response.get('message', 'No message')}")
+            print(f"   ✅ Deleted duties count: {response.get('count', 'Unknown')}")
+            
+            # Verify deletion by checking user duties
+            verify_success, duties_response = self.run_test(
+                "Verify Duties Deleted",
+                "GET",
+                f"duties/user/{self.test_user_2_id}",
+                200,
+                headers={"Authorization": f"Bearer {self.admin_token}"}
+            )
+            
+            if verify_success and len(duties_response) == 0:
+                print("   ✅ All duties successfully deleted")
+                return True
+            elif verify_success:
+                print(f"   ❌ Still found {len(duties_response)} duties after deletion")
+                return False
+            return True
+        return False
+
+    def test_get_all_duties_structure(self):
+        """Test get all duties endpoint and verify structure"""
+        if not self.admin_token:
+            print("❌ No admin token available for duties endpoint")
+            return False
+            
+        success, response = self.run_test(
+            "Get All Duties (Structure Check)",
+            "GET",
+            "duties",
+            200,
+            headers={"Authorization": f"Bearer {self.admin_token}"}
+        )
+        
+        if success:
+            print(f"   ✅ Found {len(response)} total duties")
+            if response:
+                sample_duty = response[0]
+                required_fields = ['id', 'user_id', 'user_name', 'duty_date']
+                old_fields = ['duty_type', 'position', 'shift_start', 'shift_end', 'rotation_cycle', 'notes']
+                
+                # Check for required new fields
+                missing_fields = [field for field in required_fields if field not in sample_duty]
+                present_old_fields = [field for field in old_fields if field in sample_duty]
+                
+                if not missing_fields and not present_old_fields:
+                    print("   ✅ New duty structure confirmed - all required fields present, no old fields")
+                    print(f"   ✅ Sample: {sample_duty}")
+                    return True
+                else:
+                    print(f"   ❌ Structure issues - Missing: {missing_fields}, Old fields present: {present_old_fields}")
+                    return False
             return True
         return False
 
