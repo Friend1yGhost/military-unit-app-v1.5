@@ -584,22 +584,22 @@ class MilitaryAppTester:
         return False
 
 def main():
-    print("🚀 Starting Military Unit Application API Tests")
+    print("🚀 Testing New Backend URL: https://two22-tsapb.onrender.com")
+    print("🎯 Review Request: Frontend connection to new backend")
     print("=" * 60)
     
     tester = MilitaryAppTester()
     
-    # Test sequence - NEW duty system endpoints as per review request
+    # Test sequence - Review Request specific tests
     tests = [
-        ("1. Admin Authentication", tester.test_admin_login),
-        ("2. Get Current User", tester.test_get_me),
-        ("3. Get Groups", tester.test_get_groups),
-        ("4. Get Group Members", tester.test_get_group_members),
-        ("5. 🎯 NEW Bulk Duty Creation", tester.test_new_bulk_duty_creation),
-        ("6. Get User Duties", tester.test_get_user_duties),
-        ("7. Update User Duties", tester.test_update_user_duties),
-        ("8. Delete User Duties", tester.test_delete_user_duties),
-        ("9. Get All Duties (Structure Check)", tester.test_get_all_duties_structure),
+        ("1. 🎯 Basic Availability - GET /api/settings", tester.test_get_settings),
+        ("2. 🎯 Authorization - POST /api/auth/login", tester.test_admin_login),
+        ("3. 🎯 Get News - GET /api/news", tester.test_get_news),
+        ("4. 🎯 Get Users with Token - GET /api/users", tester.test_get_users),
+        ("5. 🎯 CORS Check", tester.test_cors_headers),
+        ("6. Get Current User", tester.test_get_me),
+        ("7. Get Groups", tester.test_get_groups),
+        ("8. Get Group Members", tester.test_get_group_members),
     ]
     
     # Run tests
