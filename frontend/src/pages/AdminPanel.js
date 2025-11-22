@@ -176,8 +176,13 @@ const AdminPanel = () => {
         setEditingDuty(null);
       } else if (bulkMode && selectedDates.length > 0) {
         // Create multiple duties for selected dates
-        const startTime = dutyForm.shift_start.split('T')[1].substring(0, 5);
-        const endTime = dutyForm.shift_end.split('T')[1].substring(0, 5);
+        // Handle both time format "HH:MM" and datetime-local format "YYYY-MM-DDTHH:MM"
+        const startTime = dutyForm.shift_start.includes('T') 
+          ? dutyForm.shift_start.split('T')[1].substring(0, 5)
+          : dutyForm.shift_start;
+        const endTime = dutyForm.shift_end.includes('T')
+          ? dutyForm.shift_end.split('T')[1].substring(0, 5)
+          : dutyForm.shift_end;
         
         await axios.post(`${API}/duties/bulk`, {
           user_id: dutyForm.user_id,
