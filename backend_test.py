@@ -12,6 +12,10 @@ class MilitaryAppTester:
         self.test_user_id = None
         self.test_news_id = None
         self.test_duty_id = None
+        self.test_group_id = None
+        self.group_users = []
+        self.test_user_1_id = None
+        self.test_user_2_id = None
         self.tests_run = 0
         self.tests_passed = 0
         self.failed_tests = []
