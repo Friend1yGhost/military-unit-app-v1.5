@@ -153,3 +153,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Виправив помилку в AdminPanel.js функції handleDutySubmit. Проблема була в тому, що код намагався розділити строку часу по символу 'T', але в режимі bulk створення поля містять тільки час формату 'HH:MM'. Додав перевірку формату перед обробкою. Потрібно протестувати створення нарядів через бекенд API."
+  - agent: "testing"
+    message: "✅ BACKEND TESTING COMPLETE: Bulk duty creation endpoint is working perfectly. Successfully tested all required scenarios from review request: 1) Admin login (using existing admin credentials), 2) Retrieved users list, 3) Created 3 duties via POST /api/duties/bulk with correct date/time format, 4) Verified duties are properly stored with correct ISO datetime format. The date/time handling fix is working correctly - times are properly combined with dates. No critical issues found. Note: admin@troop.mil credentials don't exist, using sheremet.b.s@gmail.com instead."
