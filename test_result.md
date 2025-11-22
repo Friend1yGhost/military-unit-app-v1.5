@@ -102,55 +102,61 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Помилка створення наряду при використанні функції масового створення нарядів (вибір декількох дат). Проблема: некоректне форматування дати/часу при відправці на бекенд."
+user_problem_statement: "Переробити вкладку створення нарядів. Замість старої форми потрібна нова: вибір групи + таблиця з користувачами і галочками для днів місяця. Також додати можливість редагувати наряди конкретного користувача."
 
 backend:
-  - task: "Bulk duty creation endpoint"
+  - task: "New duty model and endpoints"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Endpoint /api/duties/bulk вже реалізований. Потрібно перевірити чи правильно обробляються дані з фронтенду."
-      - working: true
-        agent: "testing"
-        comment: "✅ BULK DUTY CREATION TEST PASSED: Successfully tested POST /api/duties/bulk endpoint. Admin authentication works (using sheremet.b.s@gmail.com/8662196415q). Retrieved users list successfully. Created 3 duties for dates 2025-01-15, 2025-01-16, 2025-01-17 with times 08:00-20:00. Date/time formatting is correct (ISO format: 2025-01-15T08:00:00). All duties properly stored in database. API returns correct response: 'Створено 3 нарядів' with count: 3."
+        comment: "Спрощена модель DutyRoster (тільки user_id, user_name, duty_date). Оновлені endpoints: POST /api/duties/bulk (приймає масив {user_id, dates}), GET /api/duties/user/{user_id}, PUT /api/duties/user/{user_id} (з body {dates}), DELETE /api/duties/user/{user_id}. Видалено поля: duty_type, position, shift_start, shift_end, rotation_cycle, notes."
 
 frontend:
-  - task: "Mass duty creation form - date/time handling"
+  - task: "New duty creation interface"
     implemented: true
-    working: false
+    working: "NA"
     file: "/app/frontend/src/pages/AdminPanel.js"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
-      - working: false
-        agent: "user"
-        comment: "Користувач повідомив про помилку створення наряду"
-      - working: true
+      - working: "NA"
         agent: "main"
-        comment: "Виправлено логіку обробки часу в handleDutySubmit. Додано перевірку формату: якщо значення містить 'T' (datetime-local), витягується тільки час; якщо ні (type='time'), використовується як є. Рядки 177-185."
+        comment: "Повністю переробленаі вкладка Наряди: 1) Dropdown для вибору групи, 2) Таблиця з користувачами та 31 колонкою для днів місяця з галочками, 3) Окрема секція для редагування нарядів користувача, 4) Список всіх користувачів з кнопкою 'Редагувати Наряди'."
+
+  - task: "MyDuties page updates"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/MyDuties.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Оновлено для роботи з новою структурою даних (duty_date замість shift_start/shift_end). Видалено поля duty_type, position, times. Таблиця розкладу використовує duty_date для порівняння."
 
 metadata:
   created_by: "main_agent"
-  version: "1.0"
-  test_sequence: 1
+  version: "2.0"
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Mass duty creation form - date/time handling"
+    - "New duty model and endpoints"
+    - "New duty creation interface"
+    - "MyDuties page updates"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Виправив помилку в AdminPanel.js функції handleDutySubmit. Проблема була в тому, що код намагався розділити строку часу по символу 'T', але в режимі bulk створення поля містять тільки час формату 'HH:MM'. Додав перевірку формату перед обробкою. Потрібно протестувати створення нарядів через бекенд API."
-  - agent: "testing"
-    message: "✅ BACKEND TESTING COMPLETE: Bulk duty creation endpoint is working perfectly. Successfully tested all required scenarios from review request: 1) Admin login (using existing admin credentials), 2) Retrieved users list, 3) Created 3 duties via POST /api/duties/bulk with correct date/time format, 4) Verified duties are properly stored with correct ISO datetime format. The date/time handling fix is working correctly - times are properly combined with dates. No critical issues found. Note: admin@troop.mil credentials don't exist, using sheremet.b.s@gmail.com instead."
+    message: "Переробив всю систему нарядів. BACKEND: спростив модель (тільки duty_date), оновив всі endpoints. FRONTEND: створив новий інтерфейс з вибором групи, таблицею користувачів і днями місяця, додав можливість редагування нарядів користувача. Оновив MyDuties.js для роботи з новою структурою. Потрібно протестувати всі нові endpoints та UI."
