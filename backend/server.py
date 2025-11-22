@@ -95,6 +95,9 @@ class DutyRosterCreate(BaseModel):
 class DutyRosterBulkCreate(BaseModel):
     duties: List[dict]  # [{ user_id: str, dates: [str] }]
 
+class UserDutiesUpdate(BaseModel):
+    dates: List[str]
+
 class Settings(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = "military_unit_settings"
