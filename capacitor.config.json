@@ -1,7 +1,7 @@
 {
   "appId": "com.troop.manager",
   "appName": "222 ЦАПБ",
-  "webDir": "build",
+  "webDir": "frontend/build",
   "server": {
     "androidScheme": "https",
     "cleartext": true,
