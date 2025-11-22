@@ -101,3 +101,52 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Помилка створення наряду при використанні функції масового створення нарядів (вибір декількох дат). Проблема: некоректне форматування дати/часу при відправці на бекенд."
+
+backend:
+  - task: "Bulk duty creation endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint /api/duties/bulk вже реалізований. Потрібно перевірити чи правильно обробляються дані з фронтенду."
+
+frontend:
+  - task: "Mass duty creation form - date/time handling"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/AdminPanel.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "Користувач повідомив про помилку створення наряду"
+      - working: true
+        agent: "main"
+        comment: "Виправлено логіку обробки часу в handleDutySubmit. Додано перевірку формату: якщо значення містить 'T' (datetime-local), витягується тільки час; якщо ні (type='time'), використовується як є. Рядки 177-185."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Mass duty creation form - date/time handling"
+    - "Bulk duty creation endpoint"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Виправив помилку в AdminPanel.js функції handleDutySubmit. Проблема була в тому, що код намагався розділити строку часу по символу 'T', але в режимі bulk створення поля містять тільки час формату 'HH:MM'. Додав перевірку формату перед обробкою. Потрібно протестувати створення нарядів через бекенд API."
