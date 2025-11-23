@@ -19,11 +19,11 @@ load_dotenv(ROOT_DIR / '.env')
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client[os.environ['military_db']]
 
 # Security
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = os.environ.get("SECRET_KEY", "military-secret-key-change-in-production")
+SECRET_KEY = os.environ.get("SECRET_KEY", "92d90ba580d0b62eda00fd5b7458453c")
 ALGORITHM = "HS256"
 security = HTTPBearer()
 
